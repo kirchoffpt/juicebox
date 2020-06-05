@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 
 export class Counter extends Component {
   static displayName = Counter.name;
 
   constructor(props) {
     super(props);
-    this.state = { currentCount: 0, filenames : "nofileselected", binary : null};
+    this.state = { currentCount: 0, filenames: "nofileselected", blob: [] };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
   }
@@ -21,19 +20,21 @@ export class Counter extends Component {
   onChangeFile(e) {
     e.stopPropagation();
     e.preventDefault();
-    var file = e.target.files[0];
-
-    var audioControl = document.getElementById('audio');
-    var reader = new FileReader();
-    reader.onload = function(event) {
-      // The file's text will be printed here
-      audioControl.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-
-    console.log(reader.result);
-
-    this.setState({filenames : file.name}); /// if you want to upload later
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    var self = this;
+    var audio = document.getElementById('audio');
+    var audioSrc = document.getElementById('audioSrc');
+    console.log(file.name);
+    reader.addEventListener("loadend", function () {
+      self.setState({ blob: reader.result })
+      audioSrc.src = reader.result;
+      audio.load();
+      audio.play();
+    });
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   }
 
   render() {
@@ -45,22 +46,22 @@ export class Counter extends Component {
         <p>This is a simple example of a React component.</p>
 
         <p aria-live="polite">Current count: <strong>{this.state.currentCount}</strong></p>
-      
-        <input type="text" defaultValue={this.state.filenames}/>
+
+        <input type="text" ref={this.state.filenames} />
         <button className="btn btn-primary" onClick={this.promptUserForFile}>
-          <input 
-          type="file" 
-          id="file" 
-          ref="fileUploader" 
-          accept="audio/mpeg" 
-          multiple={true} 
-          style={{display: "none"}}
-          onChange={this.onChangeFile}
+          <input
+            type="file"
+            id="file"
+            ref="fileUploader"
+            accept="audio/mpeg"
+            multiple={true}
+            style={{ display: "none" }}
+            onChange={this.onChangeFile}
           />
           BROWSE
         </button>
-        <audio controls>
-          <source src="" id="audio" type="audio/mpeg"></source>
+        <audio id="audio" controls="controls">
+          <source id="audioSrc" src="" type="audio/mpeg"></source>
         </audio>
       </div>
     );
