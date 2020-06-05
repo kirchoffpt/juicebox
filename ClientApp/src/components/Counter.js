@@ -23,21 +23,22 @@ export class Counter extends Component {
     e.preventDefault();
     var file = e.target.files[0];
 
-    var audioControl = document.getElementById('audio');
     var reader = new FileReader();
-    reader.onload = function(event) {
-      // The file's text will be printed here
-      audioControl.src = event.target.result;
-    };
+    reader.onload = (function(event) {
+      this.setState({audiosrc : event.target.result.toString(), filenames : file.name});
+    }).bind(this);
     reader.readAsDataURL(file);
+  }
 
-    console.log(reader.result);
-
-    this.setState({filenames : file.name}); /// if you want to upload later
+  update(){
+    this.forceUpdate();
+    console.log(this.state);
+    console.log(document.getElementById('audio'));
   }
 
   render() {
 
+    console.log("RENDERING!");
     return (
       <div>
         <h1>Counter</h1>
@@ -46,7 +47,7 @@ export class Counter extends Component {
 
         <p aria-live="polite">Current count: <strong>{this.state.currentCount}</strong></p>
       
-        <input type="text" defaultValue={this.state.filenames}/>
+        <input type="text" key={this.state.filenames} defaultValue={this.state.filenames}/>
         <button className="btn btn-primary" onClick={this.promptUserForFile}>
           <input 
           type="file" 
@@ -59,8 +60,11 @@ export class Counter extends Component {
           />
           BROWSE
         </button>
+        <button className="btn btn-primary" onClick={this.update.bind(this)}>
+          UPDATE
+        </button>
         <audio controls>
-          <source src="" id="audio" type="audio/mpeg"></source>
+          <source src={this.state.audiosrc} key={this.state.audiosrc} id="audio" type="audio/mpeg"></source>
         </audio>
       </div>
     );
