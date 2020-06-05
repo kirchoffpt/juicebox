@@ -1,20 +1,17 @@
 import React, { Component } from 'react';
 
-export class Counter extends Component {
-  static displayName = Counter.name;
+export class AudioPlayer extends Component {
+  static displayName = "Audio Player";
 
   constructor(props) {
     super(props);
-    this.state = { currentCount: 0, filename: "nofileselected", blob: [] };
+    this.state = { currentCount: 0, filename: "No File Selected", blob: [] };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
   }
 
   promptUserForFile(e) {
     this.refs.fileUploader.click();
-    this.setState({
-      currentCount: this.state.currentCount + 1
-    });
   }
 
   onChangeFile(e) {
@@ -26,7 +23,7 @@ export class Counter extends Component {
     var audio = document.getElementById('audio');
     var audioSrc = document.getElementById('audioSrc');
     reader.addEventListener("load", function () {
-      self.setState({ blob: reader.result, filename : file.name })
+      self.setState({ blob: reader.result, filename: file.name })
       audioSrc.src = reader.result;
       audio.load();
     });
@@ -40,12 +37,7 @@ export class Counter extends Component {
     console.log("RENDERING!");
     return (
       <div>
-        <h1>Counter</h1>
-
-        <p>This is a simple example of a React component.</p>
-
-        <p aria-live="polite">Current count: <strong>{this.state.currentCount}</strong></p>
-
+        <h1>AudioPlayer</h1>
         <input type="text" key={this.state.filename} defaultValue={this.state.filename} />
         <button className="btn btn-primary" onClick={this.promptUserForFile}>
           <input
