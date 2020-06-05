@@ -5,13 +5,17 @@ export class AudioPlayer extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { currentCount: 0, filename: "No File Selected", blob: [] };
+    this.state = { currentCount: 0, filename: "No File Selected", blob: [], val: 0 };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
   }
 
   promptUserForFile(e) {
     this.refs.fileUploader.click();
+  }
+
+  componentDidMount() {
+    this.getMedia(this.state);
   }
 
   onChangeFile(e) {
@@ -33,8 +37,6 @@ export class AudioPlayer extends Component {
   }
 
   render() {
-
-    console.log("RENDERING!");
     return (
       <div>
         <h1>AudioPlayer</h1>
@@ -56,5 +58,12 @@ export class AudioPlayer extends Component {
         </audio>
       </div>
     );
+  }
+
+  async getMedia(state) {
+    console.log("fetching data");
+    const response = await fetch('mediahandler')
+    state.setState({ val: response.text })
+    console.log(state);
   }
 }
