@@ -5,7 +5,7 @@ export class Counter extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { currentCount: 0, filenames: "nofileselected", blob: [] };
+    this.state = { currentCount: 0, filename: "nofileselected", blob: [] };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
   }
@@ -25,12 +25,10 @@ export class Counter extends Component {
     var self = this;
     var audio = document.getElementById('audio');
     var audioSrc = document.getElementById('audioSrc');
-    console.log(file.name);
-    reader.addEventListener("loadend", function () {
-      self.setState({ blob: reader.result })
+    reader.addEventListener("load", function () {
+      self.setState({ blob: reader.result, filename : file.name })
       audioSrc.src = reader.result;
       audio.load();
-      audio.play();
     });
     if (file) {
       reader.readAsDataURL(file);
@@ -47,7 +45,7 @@ export class Counter extends Component {
 
         <p aria-live="polite">Current count: <strong>{this.state.currentCount}</strong></p>
 
-        <input type="text" ref={this.state.filenames} />
+        <input type="text" key={this.state.filename} defaultValue={this.state.filename} />
         <button className="btn btn-primary" onClick={this.promptUserForFile}>
           <input
             type="file"
