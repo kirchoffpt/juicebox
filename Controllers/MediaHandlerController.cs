@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace audio_player.Controllers {
     [ApiController]
     [Route("[controller]")]
-    public class AudioPlayerController : ControllerBase {
+    public class MediaHandlerController : ControllerBase {
         public int Get() {
             System.Console.WriteLine("here");
             var t = new MediaHandler();
