@@ -9,9 +9,8 @@ namespace audio_player.Controllers {
     [ApiController]
     [Route("[controller]/[action]")]
     public class MediaHandlerController : ControllerBase {
-        public int Get() {
-            var m = new MediaHandler();
-            return m.GetMedia;
+        public Media Get() {
+            return new MediaHandler().GetMedia;
         }
 
 

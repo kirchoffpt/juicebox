@@ -7,7 +7,7 @@ namespace audio_player {
         public MediaHandler() {
         }
 
-        public int GetMedia {
+        public Media GetMedia {
             get {
                 MySqlConnection connection = new MySqlConnection(_sqlConnection);
                 connection.Open();
@@ -21,7 +21,7 @@ namespace audio_player {
                 }
                 connection.Close();
                 System.Console.WriteLine(ret);
-                return ret;
+                return new Media();
             }
         }
 
