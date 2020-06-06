@@ -25,7 +25,7 @@ namespace audio_player {
             }
         }
 
-        public void UploadMediaFile(string fileName, Object blob) {
+        public void UploadMediaFile() {
             MySqlConnection connection = new MySqlConnection(_sqlConnection);
             connection.Open();
             string query = "INSERT INTO songs VALUES(" + ");";

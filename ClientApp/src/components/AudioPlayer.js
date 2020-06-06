@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 export class AudioPlayer extends Component {
   static displayName = "Audio Player";
@@ -73,13 +74,16 @@ export class AudioPlayer extends Component {
     console.log("attempting to upload media");
     console.log("FILENAME: " + filename);
     console.log("BLOB: " + blob);
-    const response = await fetch('mediahandler', {
+    const data = { medianame: filename, blob: blob };
+    const options = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        filename: "test"
-        // blob: blob
-      })
-    });
-  }
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    }
+    fetch('/mediahandler/uploadmedia', options)
+      .then(response => response.json())
+      .then(data => console.log(data));
+  };
 }

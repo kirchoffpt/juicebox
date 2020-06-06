@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace audio_player.Controllers {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]")]
     public class MediaHandlerController : ControllerBase {
         public int Get() {
             System.Console.WriteLine("here");
@@ -18,8 +18,9 @@ namespace audio_player.Controllers {
 
 
         [HttpPost]
-        public void UploadMedia([FromBody] string fileName) {
-            System.Console.WriteLine(fileName);
+        public void UploadMedia([FromBody] Media media) {
+            System.Console.WriteLine(media.MediaName);
+            System.Console.WriteLine(media.Blob);
             // System.Console.WriteLine(blob);
             var t = new MediaHandler();
             // t.UploadMediaFile(fileName, blob);
