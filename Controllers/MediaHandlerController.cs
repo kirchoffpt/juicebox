@@ -15,9 +15,10 @@ namespace audio_player.Controllers {
 
 
         [HttpPost]
-        public void UploadMedia([FromBody] Media media) {
+        public int UploadMedia([FromBody] Media media) {
             var m = new MediaHandler();
             m.UploadMediaFile(media);
+            return 0;
         }
     }
 }

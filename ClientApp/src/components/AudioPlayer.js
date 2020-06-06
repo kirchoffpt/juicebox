@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import axios from 'axios';
 
 export class AudioPlayer extends Component {
   static displayName = "Audio Player";
@@ -71,9 +70,6 @@ export class AudioPlayer extends Component {
   }
 
   async uploadMediaFile(filename, blob) {
-    console.log("attempting to upload media");
-    console.log("FILENAME: " + filename);
-    console.log("BLOB: " + blob);
     const data = { medianame: filename, blob: blob };
     const options = {
       method: 'POST',
