@@ -14,24 +14,19 @@ export class AudioPlayer extends Component {
     this.refs.fileUploader.click();
   }
 
-  componentDidMount() {
-    // this.getMedia();
-  }
-
   onChangeFile(e) {
     e.stopPropagation();
     e.preventDefault();
     const file = e.target.files[0];
     const reader = new FileReader();
-    var self = this;
     var audio = document.getElementById('audio');
     var audioSrc = document.getElementById('audioSrc');
-    reader.addEventListener("load", function () {
-      self.setState({ blob: reader.result, filename: file.name })
+    reader.addEventListener("load", (function () {
+      this.setState({ blob: reader.result, filename: file.name })
       audioSrc.src = reader.result;
-      self.uploadMediaFile(file.name, self.state.blob);
+      this.uploadMediaFile(file.name, this.state.blob);
       audio.load();
-    });
+    }).bind(this));
     if (file) {
       reader.readAsDataURL(file)
     }
