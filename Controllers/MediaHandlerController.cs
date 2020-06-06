@@ -14,8 +14,15 @@ namespace audio_player.Controllers {
             var t = new MediaHandler();
             var ret = t.GetMedia;
             return ret;
+        }
 
+
+        [HttpPost]
+        public void UploadMedia([FromBody] string fileName) {
+            System.Console.WriteLine(fileName);
+            // System.Console.WriteLine(blob);
+            var t = new MediaHandler();
+            // t.UploadMediaFile(fileName, blob);
         }
     }
-
 }

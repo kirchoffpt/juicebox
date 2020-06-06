@@ -5,7 +5,7 @@ export class AudioPlayer extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { currentCount: 0, filename: "No File Selected", blob: [], val : "null" };
+    this.state = { currentCount: 0, filename: "No File Selected", blob: [], val: "null" };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
   }
@@ -15,7 +15,7 @@ export class AudioPlayer extends Component {
   }
 
   componentDidMount() {
-    this.getMedia();
+    // this.getMedia();
   }
 
   onChangeFile(e) {
@@ -29,10 +29,11 @@ export class AudioPlayer extends Component {
     reader.addEventListener("load", function () {
       self.setState({ blob: reader.result, filename: file.name })
       audioSrc.src = reader.result;
+      self.uploadMediaFile(file.name, self.state.blob);
       audio.load();
     });
     if (file) {
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file)
     }
   }
 
@@ -65,7 +66,20 @@ export class AudioPlayer extends Component {
     console.log("fetching data");
     const response = await fetch('mediahandler');
     const data = await response.json();
-    this.setState({val : data});
-    console.log(data);
+    this.setState({ val: data });
+  }
+
+  async uploadMediaFile(filename, blob) {
+    console.log("attempting to upload media");
+    console.log("FILENAME: " + filename);
+    console.log("BLOB: " + blob);
+    const response = await fetch('mediahandler', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        filename: "test"
+        // blob: blob
+      })
+    });
   }
 }

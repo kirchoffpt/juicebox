@@ -3,7 +3,7 @@ using MySql.Data.MySqlClient;
 
 namespace audio_player {
     public class MediaHandler {
-        private static string _sqlConnection = "server=96.253.124.15;port=3306;userid=dev;password=devpassword;database=testdb";
+        private static string _sqlConnection = "server=96.253.124.15;port=3306;userid=dev;password=devpassword;database=myDatabase";
         public MediaHandler() {
         }
 
@@ -23,6 +23,12 @@ namespace audio_player {
                 System.Console.WriteLine(ret);
                 return ret;
             }
+        }
+
+        public void UploadMediaFile(string fileName, Object blob) {
+            MySqlConnection connection = new MySqlConnection(_sqlConnection);
+            connection.Open();
+            string query = "INSERT INTO songs VALUES(" + ");";
         }
 
     }
