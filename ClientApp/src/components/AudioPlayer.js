@@ -5,7 +5,7 @@ export class AudioPlayer extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { currentCount: 0, filename: "No File Selected", blob: [], val: 0 };
+    this.state = { currentCount: 0, filename: "No File Selected", blob: [] };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
   }
@@ -15,7 +15,7 @@ export class AudioPlayer extends Component {
   }
 
   componentDidMount() {
-    this.getMedia(this.state);
+    this.getMedia();
   }
 
   onChangeFile(e) {
@@ -60,10 +60,9 @@ export class AudioPlayer extends Component {
     );
   }
 
-  async getMedia(state) {
+  async getMedia() {
     console.log("fetching data");
     const response = await fetch('mediahandler')
-    state.setState({ val: response.text })
-    console.log(state);
+    console.log(response.text);
   }
 }
