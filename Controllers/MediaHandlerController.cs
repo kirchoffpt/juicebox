@@ -10,20 +10,15 @@ namespace audio_player.Controllers {
     [Route("[controller]/[action]")]
     public class MediaHandlerController : ControllerBase {
         public int Get() {
-            System.Console.WriteLine("here");
-            var t = new MediaHandler();
-            var ret = t.GetMedia;
-            return ret;
+            var m = new MediaHandler();
+            return m.GetMedia;
         }
 
 
         [HttpPost]
         public void UploadMedia([FromBody] Media media) {
-            System.Console.WriteLine(media.MediaName);
-            System.Console.WriteLine(media.Blob);
-            // System.Console.WriteLine(blob);
-            var t = new MediaHandler();
-            // t.UploadMediaFile(fileName, blob);
+            var m = new MediaHandler();
+            m.UploadMediaFile(media);
         }
     }
 }
