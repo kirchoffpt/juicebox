@@ -30,12 +30,28 @@ namespace audio_player {
             connection.Open();
             var cmd = new MySqlCommand();
             cmd.Connection = connection;
-
-            cmd.CommandText = "INSERT INTO songs(name,data) VALUES(@name, @data)";
-            cmd.Parameters.AddWithValue("@name", media.MediaName);
+            cmd.CommandText = "INSERT INTO songs(name,data) VALUES(@name, @data) ON DUPLICATE KEY UPDATE data=@data";
+            cmd.Parameters.AddWithValue("@name", media.Name);
             cmd.Parameters.AddWithValue("@data", media.Blob);
             cmd.ExecuteNonQuery();
             connection.Close();
+        }
+
+        public Media DownloadMediaFile(string medianame) {
+            MySqlConnection connection = new MySqlConnection(_sqlConnection);
+            connection.Open();
+            var cmd = new MySqlCommand();
+            var media = new Media();
+            cmd.Connection = connection;
+            cmd.CommandText = "SELECT name,data FROM songs WHERE name=@name;";
+            cmd.Parameters.AddWithValue("@name", medianame);
+            var reader = cmd.ExecuteReader();
+            reader.Read();
+            media.Name = reader.GetString("name");
+            media.Blob = reader.GetString("data");
+            reader.Close();
+            connection.Close();
+            return media;
         }
 
     }

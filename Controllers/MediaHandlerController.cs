@@ -20,5 +20,11 @@ namespace audio_player.Controllers {
             m.UploadMediaFile(media);
             return 0;
         }
+
+        [HttpGet]
+        public Media DownloadMedia(string name) {
+            var m = new MediaHandler();
+            return m.DownloadMediaFile(name);
+        }
     }
 }
