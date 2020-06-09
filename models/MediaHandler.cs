@@ -46,9 +46,10 @@ namespace audio_player {
             cmd.CommandText = "SELECT name,data FROM songs WHERE name=@name;";
             cmd.Parameters.AddWithValue("@name", medianame);
             var reader = cmd.ExecuteReader();
-            reader.Read();
-            media.Name = reader.GetString("name");
-            media.Blob = reader.GetString("data");
+            if(reader.Read()){
+                media.Name = reader.GetString("name");
+                media.Blob = reader.GetString("data");
+            }
             reader.Close();
             connection.Close();
             return media;
