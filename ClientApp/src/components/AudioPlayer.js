@@ -1,14 +1,21 @@
-import React, { Component, forwardRef } from 'react';
+import React, { Component } from 'react';
+import { SongList } from './SongList';
 
 export class AudioPlayer extends Component {
   static displayName = "Audio Player";
 
   constructor(props) {
     super(props);
-    this.state = { currentCount: 0, filename: "No File Selected", blob: [], val: "null" };
+    this.state = { currentCount: 0, 
+      filename: "No File Selected", 
+      blob: [], 
+      val: "null", 
+      downloading : false
+    };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
     this.loadMedia = this.loadMedia.bind(this);
+    this.updateSongNames = this.updateSongNames.bind(this);
   }
 
   promptUserForFile(e) {
@@ -34,6 +41,8 @@ export class AudioPlayer extends Component {
   }
 
   async loadMedia(e){
+    if(this.state.downloading) return;
+    this.setState({ downloading : true })
     var audio = document.getElementById('audio');
     var audioSrc = document.getElementById('audioSrc');
     var filename = document.getElementById('filetoget').value
@@ -41,9 +50,22 @@ export class AudioPlayer extends Component {
     const data = await response.json();
     audioSrc.src = data.blob;
     audio.load();
+    this.setState({ downloading : false })
+  }
+
+  async updateSongNames() {
+    const response = await fetch('mediahandler/getsongnames');
+    const data = await response.json();
+    this.setState({songNames : data});
+  }
+
+  componentDidMount() {
+    //load song names
+    this.updateSongNames();
   }
 
   render() {
+    let downloadButtonString = this.state.downloading ? "..." : "DOWNLOAD";
     return (
       <div>
         <h1>AudioPlayer</h1>
@@ -66,17 +88,11 @@ export class AudioPlayer extends Component {
         <b>{this.state.val}</b>
         <input id="filetoget" type="text" defaultValue="type song to load" />
         <button className="btn btn-primary" onClick={this.loadMedia}>
-          DOWNLOAD
+          {downloadButtonString}
         </button>
+        <SongList songNames={this.state.songNames}/>
       </div>
     );
-  }
-
-  async getMedia() {
-    console.log("fetching data");
-    const response = await fetch('mediahandler');
-    const data = await response.json();
-    this.setState({ val: data });
   }
 
   async uploadMediaFile(filename, blob) {
@@ -88,8 +104,7 @@ export class AudioPlayer extends Component {
       },
       body: JSON.stringify(data),
     }
-    fetch('/mediahandler/uploadmedia', options)
-      .then(response => response.json())
-      .then(data => console.log(data));
+    const response = await fetch('/mediahandler/uploadmedia', options)
+    this.updateSongNames();
   };
 }

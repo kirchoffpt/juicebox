@@ -12,8 +12,8 @@ export default class App extends Component {
   render() {
     return (
       <Layout>
-        <Route exact path='/' component={Home} />
-        <Route path='/AudioPlayer' component={AudioPlayer} />
+        <Route exact path='/' component={AudioPlayer} />
+        <Route path='/About' component={Home} />
       </Layout>
     );
   }

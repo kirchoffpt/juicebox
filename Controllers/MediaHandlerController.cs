@@ -23,8 +23,12 @@ namespace audio_player.Controllers {
 
         [HttpGet]
         public Media DownloadMedia(string name) {
-            var m = new MediaHandler();
-            return m.DownloadMediaFile(name);
+            return new MediaHandler().DownloadMediaFile(name);
+        }
+
+        [HttpGet]
+        public string[] GetSongNames() {
+            return new MediaHandler().GetSongNames();
         }
     }
 }

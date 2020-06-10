@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 namespace audio_player {
@@ -53,6 +54,23 @@ namespace audio_player {
             reader.Close();
             connection.Close();
             return media;
+        }
+
+        public string[] GetSongNames() {
+            List<string> songnames = new List<string>();
+            MySqlConnection connection = new MySqlConnection(_sqlConnection);
+            connection.Open();
+            var cmd = new MySqlCommand();
+            var media = new Media();
+            cmd.Connection = connection;
+            cmd.CommandText = "SELECT name FROM songs;";
+            var reader = cmd.ExecuteReader();
+            while(reader.Read()){
+                songnames.Add(reader.GetString("name"));
+            }
+            reader.Close();
+            connection.Close();
+            return songnames.ToArray();
         }
 
     }
