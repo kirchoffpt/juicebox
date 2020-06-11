@@ -1,16 +1,22 @@
-import React, { Component } from 'react';
+import React, { Component, forwardRef } from 'react';
 import { SongList } from './SongList';
+import AudioSpectrum from 'react-audio-spectrum';
+import Slider from '@material-ui/core/Slider';
+import MaterialButton from '@material-ui/core/Button';
+import PauseIcon from '@material-ui/icons/Pause';
 
 export class AudioPlayer extends Component {
   static displayName = "Audio Player";
 
   constructor(props) {
     super(props);
-    this.state = { currentCount: 0, 
-      filename: "No File Selected", 
-      blob: [], 
-      val: "null", 
-      downloading : false
+    this.state = {
+      currentCount: 0,
+      filename: "No File Selected",
+      blob: [],
+      volumeValue: 60,
+      downloading: false,
+      currentTime: 0
     };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
@@ -40,23 +46,46 @@ export class AudioPlayer extends Component {
     }
   }
 
-  async loadMedia(e){
-    if(this.state.downloading) return;
-    this.setState({ downloading : true })
+  async loadMedia() {
     var audio = document.getElementById('audio');
     var audioSrc = document.getElementById('audioSrc');
     var filename = document.getElementById('filetoget').value
     const response = await fetch('/mediahandler/downloadmedia?name=' + filename);
     const data = await response.json();
+    this.setState({ blob: data.blob });
     audioSrc.src = data.blob;
     audio.load();
-    this.setState({ downloading : false })
+    this.setState({ downloading: false })
   }
 
   async updateSongNames() {
     const response = await fetch('mediahandler/getsongnames');
     const data = await response.json();
-    this.setState({songNames : data});
+    this.setState({ songNames: data });
+  }
+
+  pause = () => {
+    document.getElementById('audio-element').pause();
+  }
+
+  play = () => {
+    document.getElementById('audio-element').play();
+  }
+
+  handleSeek(e, val) {
+    this.setState({ currentTime: val });
+    var scaled = val / 100 * document.getElementById('audio-element').duration;
+    document.getElementById('audio-element').currentTime = scaled;
+  }
+
+  handleVolumeBar(e, val) {
+    document.getElementById('audio-element').volume = val / 100;
+    this.setState({ volumeValue: val });
+  }
+
+  updateTime() {
+    // var val = this.state.currentTime / document.getElementById('audio-element').duration * 100;
+    // this.setState({ seekValue: val });
   }
 
   componentDidMount() {
@@ -90,8 +119,50 @@ export class AudioPlayer extends Component {
         <button className="btn btn-primary" onClick={this.loadMedia}>
           {downloadButtonString}
         </button>
-        <SongList songNames={this.state.songNames}/>
-      </div>
+        <SongList songNames={this.state.songNames} />
+
+        <audio id="audio-element"
+          src={this.state.blob}
+          autoPlay
+          onTimeUpdate={this.updateTime()}
+        >
+        </audio>
+        <span>
+          <AudioSpectrum
+            id="audio-canvas"
+            height={200}
+            width={800}
+            audioId={'audio-element'}
+            capColor={'red'}
+            capHeight={2}
+            meterWidth={20}
+            meterCount={750}
+            meterColor={[
+              { stop: 0, color: '#f00' },
+              { stop: 0.5, color: '#0CD7FD' },
+              { stop: 1, color: 'red' }
+            ]}
+            gap={4}
+          />
+        </span>
+        <br></br>
+        <MaterialButton id='play' variant='outlined' color='primary' onClick={this.play}>Play</MaterialButton>
+        <MaterialButton id='pause' variant='outlined' color='primary' onClick={this.pause}>Pause</MaterialButton>
+
+        <Slider id='seekBar'
+          onChange={(e, val) => this.handleSeek(e, val)}
+          value={this.state.currentTime}
+          valueLabelDisplay='auto'
+        ></Slider>
+        <Slider id='volumeBar'
+          onChange={(e, val) => this.handleVolumeBar(e, val)}
+          value={this.state.volumeValue}
+          valueLabelDisplay='auto'
+        ></Slider>
+
+
+
+      </div >
     );
   }
 
