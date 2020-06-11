@@ -9,27 +9,25 @@ export class SongList extends Component {
     this.listIdx = 0;
   }
 
-  setCurrSong(index, songname){
+  setCurrSong(songname){
     document.getElementById("filetoget").value = songname; 
-    this.setState({ activeIndex: index })
+    this.setState({ activeIndex: songname })
   }
 
   render() {
    
     var listItems = this.props.songNames
-    this.listIdx = 0;
     if(listItems){
         listItems = this.props.songNames.map((songname) =>
         <SongElement 
             key={songname} 
-            index={this.listIdx} 
-            onClick={index => this.setCurrSong(index,songname)} 
+            index={songname} 
+            onClick={() => this.setCurrSong(songname)} 
             songname={songname}
-            isActive={this.listIdx++ == this.state.activeIndex}
+            isActive={songname === this.state.activeIndex}
             />
         );
     }
-    console.log(this.state.activeIndex);
 
     return (
         <div className="listWrapper">
@@ -42,19 +40,19 @@ export class SongList extends Component {
 }
 
 class SongElement extends Component {
-    static displayName = "Song List";
+  static displayName = "Song Element";
 
   constructor(props) {
     super(props);
     this.state = {};
   }
 
-  handleClick = () => this.props.onClick(this.props.index);
+  handleClick = () => this.props.onClick();
 
   render() {
     var classname = "list-group-item list-group-item-action" + (this.props.isActive ? " active" : "");
     return (
-        <a onClick={this.handleClick} className={classname}>{this.props.songname}</a>
+        <button onClick={this.handleClick} className={classname}>{this.props.songname}</button>
     );
   }
 }

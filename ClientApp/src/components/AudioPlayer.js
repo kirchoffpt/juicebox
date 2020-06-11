@@ -10,12 +10,14 @@ export class AudioPlayer extends Component {
       filename: "No File Selected", 
       blob: [], 
       val: "null", 
-      downloading : false
+      downloading : false,
+      uploadingSongNames : []
     };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
     this.loadMedia = this.loadMedia.bind(this);
     this.updateSongNames = this.updateSongNames.bind(this);
+    this.readFile = this.readFile.bind(this);
   }
 
   promptUserForFile(e) {
@@ -25,20 +27,30 @@ export class AudioPlayer extends Component {
   onChangeFile(e) {
     e.stopPropagation();
     e.preventDefault();
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    var audio = document.getElementById('audio');
-    var audioSrc = document.getElementById('audioSrc');
-    reader.addEventListener("load", (function () {
-      audioSrc.src = reader.result;
-      this.setState({ blob: reader.result, filename: file.name })
-      this.uploadMediaFile(file.name, this.state.blob);
-      audio.load();
-    }).bind(this));
-    if (file) {
-      reader.readAsDataURL(file)
+    for(let i = 0; i < e.target.files.length; i++){
+      var file = e.target.files[i];
+      //var pureName = file.name.replace(/\.[^/\\.]+$/, "");
+      this.readFile(file);
     }
   }
+
+  readFile(file){
+    return new Promise((function(resolve, reject){
+        var reader = new FileReader();
+        reader.onload = (function(evt){
+            //console.log("Just read", file.name);
+            this.setState({ filename: file.name })
+            this.uploadMediaFile(file.name, evt.target.result);
+            resolve(evt.target.result);
+        }).bind(this);
+        reader.onerror = function(err) {
+            console.error("Failed to read", file.name, "due to", err);
+            reject(err);
+        };
+        reader.readAsDataURL(file);
+        // Would be sweet if readAsDataURL already returned a promise
+    }).bind(this));
+}
 
   async loadMedia(e){
     if(this.state.downloading) return;
@@ -66,6 +78,13 @@ export class AudioPlayer extends Component {
 
   render() {
     let downloadButtonString = this.state.downloading ? "..." : "DOWNLOAD";
+    let uploadingSongNames = "";
+    if(this.state.uploadingSongNames.length > 0){
+      uploadingSongNames = "uploading: "
+      for (var x in this.state.uploadingSongNames){
+        uploadingSongNames += this.state.uploadingSongNames[x] + " ";
+      }
+    }
     return (
       <div>
         <h1>AudioPlayer</h1>
@@ -85,18 +104,21 @@ export class AudioPlayer extends Component {
         <audio id="audio" controls="controls">
           <source id="audioSrc" src="" type="audio/mpeg"></source>
         </audio>
-        <b>{this.state.val}</b>
         <input id="filetoget" type="text" defaultValue="type song to load" />
         <button className="btn btn-primary" onClick={this.loadMedia}>
           {downloadButtonString}
         </button>
         <SongList songNames={this.state.songNames}/>
+        <i>{uploadingSongNames}</i>
       </div>
     );
   }
 
   async uploadMediaFile(filename, blob) {
     const data = { name: filename, blob: blob };
+    var uploadingSongNames = this.state.uploadingSongNames;
+    uploadingSongNames.push(filename);
+    this.setState({uploadingSongNames});
     const options = {
       method: 'POST',
       headers: {
@@ -104,7 +126,9 @@ export class AudioPlayer extends Component {
       },
       body: JSON.stringify(data),
     }
-    const response = await fetch('/mediahandler/uploadmedia', options)
+    const response = await fetch('/mediahandler/uploadmedia', options);
+    uploadingSongNames = this.state.uploadingSongNames.filter(ele => ele !== filename);
+    this.setState({uploadingSongNames});
     this.updateSongNames();
   };
 }
