@@ -8,32 +8,15 @@ namespace audio_player {
         public MediaHandler() {
         }
 
-        public Media GetMedia {
-            get {
-                MySqlConnection connection = new MySqlConnection(_sqlConnection);
-                connection.Open();
-                string query = "select * from numbers";
-                MySqlCommand cmd = new MySqlCommand(query, connection);
-                var reader = cmd.ExecuteReader();
-                var ret = 0;
-                while (reader.Read()) {
-                    System.Console.WriteLine(reader[0]);
-                    ret = Int16.Parse(reader[0].ToString());
-                }
-                connection.Close();
-                System.Console.WriteLine(ret);
-                return new Media();
-            }
-        }
-
         public void UploadMediaFile(Media media) {
             MySqlConnection connection = new MySqlConnection(_sqlConnection);
             connection.Open();
             var cmd = new MySqlCommand();
             cmd.Connection = connection;
-            cmd.CommandText = "INSERT INTO songs(name,data) VALUES(@name, @data) ON DUPLICATE KEY UPDATE data=@data";
+            cmd.CommandText = "INSERT INTO songs(name,size,data) VALUES(@name,@size,@data) ON DUPLICATE KEY UPDATE data=@data, size=@size";
             cmd.Parameters.AddWithValue("@name", media.Name);
             cmd.Parameters.AddWithValue("@data", media.Blob);
+            cmd.Parameters.AddWithValue("@size", media.Size);
             cmd.ExecuteNonQuery();
             connection.Close();
         }
@@ -56,6 +39,23 @@ namespace audio_player {
             return media;
         }
 
+        public string[] GetColumnFromName(string name, string column) {
+            MySqlConnection connection = new MySqlConnection(_sqlConnection);
+            connection.Open();
+            var cmd = new MySqlCommand();
+            string[] result = new string[1];
+            cmd.Connection = connection;
+            cmd.CommandText = "SELECT " + column + " FROM songs WHERE name=@name;";
+            cmd.Parameters.AddWithValue("@name", name);
+            var reader = cmd.ExecuteReader();
+            if(reader.Read()){
+                 result[0] = reader.GetString(0);
+            }
+            reader.Close();
+            connection.Close();
+            return result;
+        }
+
         public string[] GetSongNames() {
             List<string> songnames = new List<string>();
             MySqlConnection connection = new MySqlConnection(_sqlConnection);
@@ -73,5 +73,24 @@ namespace audio_player {
             return songnames.ToArray();
         }
 
+        //https://localhost:5001/mediahandler/downloadmediachunk?name=easy.mp3?idx=1?size=100
+        public string[] DownloadMediaChunk(string name, int idx, int size) {
+            MySqlConnection connection = new MySqlConnection(_sqlConnection);
+            string[] chunks = new string[1];
+            connection.Open();
+            var cmd = new MySqlCommand();
+            cmd.Connection = connection;
+            cmd.CommandText = "SELECT SUBSTR(data, @idx, @size) AS chunk FROM songs WHERE name=@name;";
+            cmd.Parameters.AddWithValue("@name", name);
+            cmd.Parameters.AddWithValue("@idx", idx);
+            cmd.Parameters.AddWithValue("@size", size);
+            var reader = cmd.ExecuteReader();
+            if(reader.Read()){
+                chunks[0] = reader.GetString(0);
+            }
+            reader.Close();
+            connection.Close();
+            return chunks;
+        }
     }
 }

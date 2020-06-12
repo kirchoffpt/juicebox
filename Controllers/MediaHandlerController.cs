@@ -9,10 +9,6 @@ namespace audio_player.Controllers {
     [ApiController]
     [Route("[controller]/[action]")]
     public class MediaHandlerController : ControllerBase {
-        public Media Get() {
-            return new MediaHandler().GetMedia;
-        }
-
 
         [HttpPost]
         public int UploadMedia([FromBody] Media media) {
@@ -27,8 +23,19 @@ namespace audio_player.Controllers {
         }
 
         [HttpGet]
+        //should probably deprecate at some point. useful for prototyping for now
+        public string[] GetColumnFromName(string name, string column) {
+            return new MediaHandler().GetColumnFromName(name, column);
+        }
+
+        [HttpGet]
         public string[] GetSongNames() {
             return new MediaHandler().GetSongNames();
+        }
+
+        [HttpGet]
+        public string[] DownloadMediaChunk(string name, int idx, int size) {
+            return new MediaHandler().DownloadMediaChunk(name, idx, size);
         }
     }
 }

@@ -8,10 +8,10 @@ export class AudioPlayer extends Component {
     super(props);
     this.state = { currentCount: 0, 
       filename: "No File Selected", 
-      blob: [], 
-      val: "null", 
+      datacache: "", 
       downloading : false,
-      uploadingSongNames : []
+      uploadingSongNames : [],
+      progress : 0
     };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
@@ -37,30 +37,43 @@ export class AudioPlayer extends Component {
   readFile(file){
     return new Promise((function(resolve, reject){
         var reader = new FileReader();
-        reader.onload = (function(evt){
-            //console.log("Just read", file.name);
+        reader.onload = (function(e){
             this.setState({ filename: file.name })
-            this.uploadMediaFile(file.name, evt.target.result);
-            resolve(evt.target.result);
+            this.uploadMediaFile(file.name, e.target.result);
+            resolve(e.target.result);
         }).bind(this);
         reader.onerror = function(err) {
             console.error("Failed to read", file.name, "due to", err);
             reject(err);
         };
         reader.readAsDataURL(file);
-        // Would be sweet if readAsDataURL already returned a promise
     }).bind(this));
 }
 
+
+  //https://dev.mysql.com/doc/connector-net/en/connector-net-programming-blob-reading.html
+
   async loadMedia(e){
     if(this.state.downloading) return;
-    this.setState({ downloading : true })
+    this.setState({ downloading : true });
+
+    var filename = document.getElementById('filetoget').value;
+    const sizeResponse = await fetch('/mediahandler/getcolumnfromname?name=' + filename + '&column=size');
+    const sizeData = await sizeResponse.json();
+    const fileSize = sizeData[0];
     var audio = document.getElementById('audio');
-    var audioSrc = document.getElementById('audioSrc');
-    var filename = document.getElementById('filetoget').value
-    const response = await fetch('/mediahandler/downloadmedia?name=' + filename);
-    const data = await response.json();
-    audioSrc.src = data.blob;
+    var chunkSize = 1000;
+    var idx = 1;
+    var progress = 0;
+    this.setState({progress, datacache : ""});
+    do{
+      var response = await fetch('/mediahandler/downloadmediachunk?name=' + filename + '&idx=' + idx.toString() + '&size=' + chunkSize.toString());
+      var data = await response.json();
+      idx += chunkSize;
+      progress = Math.min(100,Math.round(100*idx/fileSize));
+      this.setState({progress, datacache : this.state.datacache + data[0]});
+      chunkSize = Math.min(chunkSize*2,2E6);
+    }while(data[0] !== null && data[0].length > 0);
     audio.load();
     this.setState({ downloading : false })
   }
@@ -88,8 +101,7 @@ export class AudioPlayer extends Component {
     return (
       <div>
         <h1>AudioPlayer</h1>
-        <input type="text" key={this.state.filename} defaultValue={this.state.filename} />
-        <button className="btn btn-primary" onClick={this.promptUserForFile}>
+        <button className="btn btn-primary mb-3" onClick={this.promptUserForFile}>
           <input
             type="file"
             id="file"
@@ -101,21 +113,31 @@ export class AudioPlayer extends Component {
           />
           BROWSE
         </button>
-        <audio id="audio" controls="controls">
-          <source id="audioSrc" src="" type="audio/mpeg"></source>
-        </audio>
-        <input id="filetoget" type="text" defaultValue="type song to load" />
-        <button className="btn btn-primary" onClick={this.loadMedia}>
-          {downloadButtonString}
-        </button>
+        <div className="input-group mb-3">
+          <div className="input-group-prepend">
+            <span className="input-group-text" id="basic-addon1">♫</span>
+          </div>
+          <input id="filetoget" type="text" className="form-control" placeholder="" aria-label="Username" aria-describedby="basic-addon1"/>
+          <button className="btn btn-primary" onClick={this.loadMedia}>
+           {downloadButtonString}
+          </button>
+        </div>
+        <div className="progress mb-3">
+          <div className="progress-bar" id="loadbar" role="progressbar" style={{width : this.state.progress.toString() + "%"}} aria-valuenow={this.state.progress.toString()} aria-valuemin="0" aria-valuemax="100">
+            {this.state.progress.toString()+"%"}
+          </div>
+        </div>
         <SongList songNames={this.state.songNames}/>
         <i>{uploadingSongNames}</i>
+        <audio className="mb-3" autoPlay={false} src={this.state.datacache} id="audio" controls="controls">
+          
+        </audio>
       </div>
     );
   }
 
   async uploadMediaFile(filename, blob) {
-    const data = { name: filename, blob: blob };
+    const data = { name: filename, blob: blob, size : blob.length};
     var uploadingSongNames = this.state.uploadingSongNames;
     uploadingSongNames.push(filename);
     this.setState({uploadingSongNames});
@@ -131,4 +153,12 @@ export class AudioPlayer extends Component {
     this.setState({uploadingSongNames});
     this.updateSongNames();
   };
+}
+
+function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
 }
