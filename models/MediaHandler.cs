@@ -1,6 +1,10 @@
 using System;
+using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace audio_player {
     public class MediaHandler {
@@ -8,15 +12,28 @@ namespace audio_player {
         public MediaHandler() {
         }
 
-        public void UploadMediaFile(Media media) {
+        public void UploadMediaFile(IFormFile file) {
+            byte[] result;
+            var filePath = @".\Songs\"+file.FileName;
+
+                using(var memoryStream = new MemoryStream())
+                {
+                    file.OpenReadStream().CopyTo(memoryStream);
+                    result = memoryStream.ToArray();
+                }
+           
+                using (FileStream fs = File.Create(filePath)){
+                    fs.Write(result,0,result.Length);
+                }
+
             MySqlConnection connection = new MySqlConnection(_sqlConnection);
             connection.Open();
             var cmd = new MySqlCommand();
             cmd.Connection = connection;
             cmd.CommandText = "INSERT INTO songs(name,size,data) VALUES(@name,@size,@data) ON DUPLICATE KEY UPDATE data=@data, size=@size";
-            cmd.Parameters.AddWithValue("@name", media.Name);
-            cmd.Parameters.AddWithValue("@data", media.Blob);
-            cmd.Parameters.AddWithValue("@size", media.Size);
+            cmd.Parameters.AddWithValue("@name", file.FileName);
+            cmd.Parameters.AddWithValue("@data", result);
+            cmd.Parameters.AddWithValue("@size", file.Length);
             cmd.ExecuteNonQuery();
             connection.Close();
         }
@@ -37,6 +54,16 @@ namespace audio_player {
             reader.Close();
             connection.Close();
             return media;
+        }
+
+        public FileContentResult GetSong(string filename, int seek) {
+            var myfile = System.IO.File.ReadAllBytes(@".\Songs\"+filename);
+            seek = Math.Max(seek, 0);
+            seek = Math.Min(seek, 100); 
+            int fileLength = myfile.Length;
+            int skipBytes = (fileLength*seek)/100;
+            myfile = myfile.Skip(skipBytes).ToArray();
+            return new FileContentResult(myfile, "audio/mpeg"); 
         }
 
         public string[] GetColumnFromName(string name, string column) {

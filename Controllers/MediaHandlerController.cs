@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
 
 namespace audio_player.Controllers {
     [ApiController]
@@ -11,9 +12,10 @@ namespace audio_player.Controllers {
     public class MediaHandlerController : ControllerBase {
 
         [HttpPost]
-        public int UploadMedia([FromBody] Media media) {
+        public int UploadMedia(IFormCollection data, IFormFile file) {
+            System.Console.WriteLine(data["name"]);
             var m = new MediaHandler();
-            m.UploadMediaFile(media);
+            m.UploadMediaFile(file);
             return 0;
         }
 
@@ -36,6 +38,12 @@ namespace audio_player.Controllers {
         [HttpGet]
         public string[] DownloadMediaChunk(string name, int idx, int size) {
             return new MediaHandler().DownloadMediaChunk(name, idx, size);
+        }
+
+        [HttpGet]
+        public FileContentResult GetSong(string name, int seek) {
+            var myfile = new MediaHandler().GetSong(name, seek);
+            return myfile;
         }
     }
 }

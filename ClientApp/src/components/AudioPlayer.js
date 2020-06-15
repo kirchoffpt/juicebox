@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { SongList } from './SongList';
+import Slider from '@material-ui/core/Slider';
+import Icon from '@material-ui/core/Icon'
+import PlayArrow from '@material-ui/icons/PlayArrow';
 
 export class AudioPlayer extends Component {
   static displayName = "Audio Player";
@@ -8,16 +11,21 @@ export class AudioPlayer extends Component {
     super(props);
     this.state = { currentCount: 0, 
       filename: "No File Selected", 
-      datacache: "", 
+      dataurl: "",
       downloading : false,
       uploadingSongNames : [],
-      progress : 0
+      progress : 0,
+      progressStart : 0,
     };
     this.promptUserForFile = this.promptUserForFile.bind(this);
     this.onChangeFile = this.onChangeFile.bind(this);
     this.loadMedia = this.loadMedia.bind(this);
     this.updateSongNames = this.updateSongNames.bind(this);
-    this.readFile = this.readFile.bind(this);
+    this.uploadMediaFile = this.uploadMediaFile.bind(this);
+    this.handleProgress = this.handleProgress.bind(this);
+    this.handleSeek = this.handleSeek.bind(this);
+    this.audioElement = new Audio();
+    this.dragging = false;
   }
 
   promptUserForFile(e) {
@@ -30,52 +38,42 @@ export class AudioPlayer extends Component {
     for(let i = 0; i < e.target.files.length; i++){
       var file = e.target.files[i];
       //var pureName = file.name.replace(/\.[^/\\.]+$/, "");
-      this.readFile(file);
+      this.uploadMediaFile(file);
     }
   }
 
-  readFile(file){
-    return new Promise((function(resolve, reject){
-        var reader = new FileReader();
-        reader.onload = (function(e){
-            this.setState({ filename: file.name })
-            this.uploadMediaFile(file.name, e.target.result);
-            resolve(e.target.result);
-        }).bind(this);
-        reader.onerror = function(err) {
-            console.error("Failed to read", file.name, "due to", err);
-            reject(err);
-        };
-        reader.readAsDataURL(file);
-    }).bind(this));
-}
+  async uploadMediaFile(file) {
+    var formData = new FormData();
+    var uploadingSongNames = this.state.uploadingSongNames;
+    uploadingSongNames.push(file.name);
 
+    formData.append('file',file);
+    formData.append('name',file.name);
+    this.setState({uploadingSongNames});
+    const options = {
+      method: 'POST',
+      body: formData,
+    }
+    const response = await fetch('/mediahandler/uploadmedia', options);
 
-  //https://dev.mysql.com/doc/connector-net/en/connector-net-programming-blob-reading.html
+    uploadingSongNames = this.state.uploadingSongNames.filter(ele => ele !== file.name);
+    this.setState({uploadingSongNames});
+    this.updateSongNames();
+  };
 
-  async loadMedia(e){
+  loadMedia(e,seek){
     if(this.state.downloading) return;
+    if(!seek) seek = 0;
+    //var audioElement = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+    //audioElement.play();
     this.setState({ downloading : true });
-
     var filename = document.getElementById('filetoget').value;
-    const sizeResponse = await fetch('/mediahandler/getcolumnfromname?name=' + filename + '&column=size');
-    const sizeData = await sizeResponse.json();
-    const fileSize = sizeData[0];
-    var audio = document.getElementById('audio');
-    var chunkSize = 1000;
-    var idx = 1;
-    var progress = 0;
-    this.setState({progress, datacache : ""});
-    do{
-      var response = await fetch('/mediahandler/downloadmediachunk?name=' + filename + '&idx=' + idx.toString() + '&size=' + chunkSize.toString());
-      var data = await response.json();
-      idx += chunkSize;
-      progress = Math.min(100,Math.round(100*idx/fileSize));
-      this.setState({progress, datacache : this.state.datacache + data[0]});
-      chunkSize = Math.min(chunkSize*2,2E6);
-    }while(data[0] !== null && data[0].length > 0);
-    audio.load();
-    this.setState({ downloading : false })
+    this.audioElement.pause();
+    this.audioElement.src = 'mediahandler/getsong?name='+filename+'&seek='+seek.toString();
+    this.audioElement.currentTime = 500;
+    this.audioElement.play();
+
+    this.setState({ downloading : false, progressStart : seek })
   }
 
   async updateSongNames() {
@@ -84,13 +82,36 @@ export class AudioPlayer extends Component {
     this.setState({songNames : data});
   }
 
+  componentWillUnmount() {
+    this.audioElement.pause();
+  }
+
   componentDidMount() {
     //load song names
     this.updateSongNames();
+    this.audioElement.volume = 0.08;
+    this.audioElement.addEventListener('timeupdate', this.handleProgress);
+  }
+
+  handleProgress(event) {
+    if(this.dragging) return;
+    var progress = this.state.progressStart;
+    progress = progress+(100-progress)*this.audioElement.currentTime/this.audioElement.duration;
+    this.setState({progress});
+  }
+
+  handleBarChange = (event, value) => {
+    this.dragging = true;
+    this.setState({ progress : value })
+  }
+
+  handleSeek = (event, value) => {
+    this.loadMedia(null,value);
+    this.dragging = false;
   }
 
   render() {
-    let downloadButtonString = this.state.downloading ? "..." : "DOWNLOAD";
+    let downloadButtonString = this.state.downloading ? "..." : "PLAY";
     let uploadingSongNames = "";
     if(this.state.uploadingSongNames.length > 0){
       uploadingSongNames = "uploading: "
@@ -100,6 +121,7 @@ export class AudioPlayer extends Component {
     }
     return (
       <div>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
         <h1>AudioPlayer</h1>
         <button className="btn btn-primary mb-3" onClick={this.promptUserForFile}>
           <input
@@ -119,46 +141,25 @@ export class AudioPlayer extends Component {
           </div>
           <input id="filetoget" type="text" className="form-control" placeholder="" aria-label="Username" aria-describedby="basic-addon1"/>
           <button className="btn btn-primary" onClick={this.loadMedia}>
-           {downloadButtonString}
+            <PlayArrow style={{ fontSize: 15 }}></PlayArrow>
           </button>
         </div>
-        <div className="progress mb-3">
-          <div className="progress-bar" id="loadbar" role="progressbar" style={{width : this.state.progress.toString() + "%"}} aria-valuenow={this.state.progress.toString()} aria-valuemin="0" aria-valuemax="100">
-            {this.state.progress.toString()+"%"}
-          </div>
-        </div>
+        <Slider
+          id="trackbar"
+          defaultValue={0}
+          value={this.state.progress}
+          aria-labelledby="discrete-slider-small-steps"
+          step={1}
+          min={0}
+          max={100}
+          valueLabelDisplay="off"
+          onChange={this.handleBarChange} 
+          onChangeCommitted={this.handleSeek} 
+        />
         <SongList songNames={this.state.songNames}/>
         <i>{uploadingSongNames}</i>
-        <audio className="mb-3" autoPlay={false} src={this.state.datacache} id="audio" controls="controls">
-          
-        </audio>
       </div>
     );
   }
-
-  async uploadMediaFile(filename, blob) {
-    const data = { name: filename, blob: blob, size : blob.length};
-    var uploadingSongNames = this.state.uploadingSongNames;
-    uploadingSongNames.push(filename);
-    this.setState({uploadingSongNames});
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    }
-    const response = await fetch('/mediahandler/uploadmedia', options);
-    uploadingSongNames = this.state.uploadingSongNames.filter(ele => ele !== filename);
-    this.setState({uploadingSongNames});
-    this.updateSongNames();
-  };
 }
 
-function sleep(milliseconds) {
-  const date = Date.now();
-  let currentDate = null;
-  do {
-    currentDate = Date.now();
-  } while (currentDate - date < milliseconds);
-}
