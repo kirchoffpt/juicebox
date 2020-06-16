@@ -9,6 +9,10 @@ import './custom.css'
 export default class App extends Component {
   static displayName = App.name;
 
+  componentDidMount() {
+    document.body.style.backgroundColor = "rgb(24,24,24)";
+  }
+
   render() {
     return (
       <Layout>

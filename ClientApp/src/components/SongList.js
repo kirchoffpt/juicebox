@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {ListGroupItem} from 'reactstrap';
 
 export class SongList extends Component {
   static displayName = "Song List";
@@ -52,7 +53,7 @@ class SongElement extends Component {
   render() {
     var classname = "list-group-item list-group-item-action" + (this.props.isActive ? " active" : "");
     return (
-        <button onClick={this.handleClick} className={classname}>{this.props.songname}</button>
+        <ListGroupItem onClick={this.handleClick} className={classname}>{this.props.songname}</ListGroupItem>
     );
   }
 }

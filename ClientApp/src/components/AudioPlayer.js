@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { SongList } from './SongList';
 import Slider from '@material-ui/core/Slider';
-import Icon from '@material-ui/core/Icon'
-import PlayArrow from '@material-ui/icons/PlayArrow';
 
 export class AudioPlayer extends Component {
   static displayName = "Audio Player";
@@ -12,7 +10,6 @@ export class AudioPlayer extends Component {
     this.state = { currentCount: 0, 
       filename: "No File Selected", 
       dataurl: "",
-      downloading : false,
       uploadingSongNames : [],
       progress : 0,
       progressStart : 0,
@@ -54,7 +51,8 @@ export class AudioPlayer extends Component {
       method: 'POST',
       body: formData,
     }
-    const response = await fetch('/mediahandler/uploadmedia', options);
+    //const response?
+    await fetch('/mediahandler/uploadmedia', options);
 
     uploadingSongNames = this.state.uploadingSongNames.filter(ele => ele !== file.name);
     this.setState({uploadingSongNames});
@@ -62,18 +60,16 @@ export class AudioPlayer extends Component {
   };
 
   loadMedia(e,seek){
-    if(this.state.downloading) return;
     if(!seek) seek = 0;
     //var audioElement = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
     //audioElement.play();
-    this.setState({ downloading : true });
     var filename = document.getElementById('filetoget').value;
     this.audioElement.pause();
     this.audioElement.src = 'mediahandler/getsong?name='+filename+'&seek='+seek.toString();
     this.audioElement.currentTime = 500;
     this.audioElement.play();
 
-    this.setState({ downloading : false, progressStart : seek })
+    this.setState({progressStart : seek })
   }
 
   async updateSongNames() {
@@ -111,7 +107,6 @@ export class AudioPlayer extends Component {
   }
 
   render() {
-    let downloadButtonString = this.state.downloading ? "..." : "PLAY";
     let uploadingSongNames = "";
     if(this.state.uploadingSongNames.length > 0){
       uploadingSongNames = "uploading: "
@@ -122,7 +117,6 @@ export class AudioPlayer extends Component {
     return (
       <div>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-        <h1>AudioPlayer</h1>
         <button className="btn btn-primary mb-3" onClick={this.promptUserForFile}>
           <input
             type="file"
@@ -133,18 +127,19 @@ export class AudioPlayer extends Component {
             style={{ display: "none" }}
             onChange={this.onChangeFile}
           />
-          BROWSE
+          UPLOAD
         </button>
-        <div className="input-group mb-3">
+        <div className="input-group mb-4">
           <div className="input-group-prepend">
             <span className="input-group-text" id="basic-addon1">♫</span>
           </div>
           <input id="filetoget" type="text" className="form-control" placeholder="" aria-label="Username" aria-describedby="basic-addon1"/>
           <button className="btn btn-primary" onClick={this.loadMedia}>
-            <PlayArrow style={{ fontSize: 15 }}></PlayArrow>
+            ▶
           </button>
         </div>
         <Slider
+          className = "mb-3"
           id="trackbar"
           defaultValue={0}
           value={this.state.progress}
