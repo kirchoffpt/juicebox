@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace audio_player {
     public class MediaHandler {
-        private static string _sqlConnection = "server=96.253.124.15;port=3306;userid=dev;password=devpassword;database=myDatabase";
+        private static string _sqlConnection = "server=127.0.0.1;port=3306;userid=dev;password=devpassword;database=myDatabase";
         public MediaHandler() {
         }
 

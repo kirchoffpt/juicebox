@@ -42,6 +42,7 @@ namespace audio_player.Controllers {
 
         [HttpGet]
         public FileContentResult GetSong(string name, int seek) {
+            //System.Console.WriteLine(this.ModelState.IsValid);
             var myfile = new MediaHandler().GetSong(name, seek);
             return myfile;
         }

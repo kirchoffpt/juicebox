@@ -60,14 +60,17 @@ export class AudioPlayer extends Component {
   };
 
   loadMedia(e,seek){
-    if(!seek) seek = 0;
-    //var audioElement = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-    //audioElement.play();
+    if(!seek) seek = this.state.progress;
+    seek = Math.round(seek);
     var filename = document.getElementById('filetoget').value;
-    this.audioElement.pause();
-    this.audioElement.src = 'mediahandler/getsong?name='+filename+'&seek='+seek.toString();
-    this.audioElement.currentTime = 500;
-    this.audioElement.play();
+    if(!filename) return;
+    //this.audioElement.pause();
+    if(seek < 100) {
+      this.audioElement.src = 'mediahandler/getsong?name='+filename+'&seek='+seek.toString();
+      this.audioElement.play();
+    } else {
+      this.audioElement.pause();
+    }
 
     this.setState({progressStart : seek })
   }
