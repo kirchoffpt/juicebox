@@ -14,8 +14,8 @@ namespace audio_player {
 
         public void UploadMediaFile(IFormFile file) {
             byte[] result;
-            System.IO.Directory.CreateDirectory(@".\Songs");
-            var filePath = @".\Songs\"+file.FileName;
+            System.IO.Directory.CreateDirectory("Songs/");
+            var filePath = @"./Songs/"+file.FileName;
 
                 using(var memoryStream = new MemoryStream())
                 {
@@ -58,10 +58,10 @@ namespace audio_player {
         }
 
         public FileContentResult GetSong(string filename, int seek) {
-            if(!File.Exists(@".\Songs\"+filename)){
+            if(!File.Exists(@"./Songs/"+filename)){
                 return null;
             }
-            var myfile = System.IO.File.ReadAllBytes(@".\Songs\"+filename);
+            var myfile = System.IO.File.ReadAllBytes(@"./Songs/"+filename);
             seek = Math.Max(seek, 0);
             seek = Math.Min(seek, 100); 
             int fileLength = myfile.Length;
