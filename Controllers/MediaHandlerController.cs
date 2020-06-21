@@ -31,7 +31,7 @@ namespace audio_player.Controllers {
         }
 
         [HttpGet]
-        public string[] GetSongNames() {
+        public IEnumerable<string> GetSongNames() {
             return new MediaHandler().GetSongNames();
         }
 
@@ -45,6 +45,12 @@ namespace audio_player.Controllers {
             //System.Console.WriteLine(this.ModelState.IsValid);
             var myfile = new MediaHandler().GetSong(name, seek);
             return myfile;
+        }
+
+        [HttpGet]
+        public FileStreamResult GetSongStream(string name, int seek) {
+            //System.Console.WriteLine(this.ModelState.IsValid);
+            return new MediaHandler().GetSongStream(name, seek);
         }
     }
 }

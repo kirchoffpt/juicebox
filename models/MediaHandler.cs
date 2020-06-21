@@ -27,16 +27,16 @@ namespace audio_player {
                     fs.Write(result,0,result.Length);
                 }
 
-            MySqlConnection connection = new MySqlConnection(_sqlConnection);
-            connection.Open();
-            var cmd = new MySqlCommand();
-            cmd.Connection = connection;
-            cmd.CommandText = "INSERT INTO songs(name,size,data) VALUES(@name,@size,@data) ON DUPLICATE KEY UPDATE data=@data, size=@size";
-            cmd.Parameters.AddWithValue("@name", file.FileName);
-            cmd.Parameters.AddWithValue("@data", result);
-            cmd.Parameters.AddWithValue("@size", file.Length);
-            cmd.ExecuteNonQuery();
-            connection.Close();
+            // MySqlConnection connection = new MySqlConnection(_sqlConnection);
+            // connection.Open();
+            // var cmd = new MySqlCommand();
+            // cmd.Connection = connection;
+            // cmd.CommandText = "INSERT INTO songs(name,size,data) VALUES(@name,@size,@data) ON DUPLICATE KEY UPDATE data=@data, size=@size";
+            // cmd.Parameters.AddWithValue("@name", file.FileName);
+            // cmd.Parameters.AddWithValue("@data", result);
+            // cmd.Parameters.AddWithValue("@size", file.Length);
+            // cmd.ExecuteNonQuery();
+            // connection.Close();
         }
 
         public Media DownloadMediaFile(string medianame) {
@@ -63,11 +63,22 @@ namespace audio_player {
             }
             var myfile = System.IO.File.ReadAllBytes(@"./Songs/"+filename);
             seek = Math.Max(seek, 0);
-            seek = Math.Min(seek, 100); 
+            seek = Math.Min(seek, 1000); 
             int fileLength = myfile.Length;
-            int skipBytes = (fileLength*seek)/100;
+            int skipBytes = (fileLength/1000)*seek;
             myfile = myfile.Skip(skipBytes).ToArray();
             return new FileContentResult(myfile, "audio/mpeg"); 
+        }
+
+        public FileStreamResult GetSongStream(string filename, int seek) {
+            if(!File.Exists(@"./Songs/"+filename)){
+                return null;
+            }
+            var fileContent = System.IO.File.ReadAllBytes(@"./Songs/"+filename);
+            var stream = new MemoryStream(fileContent);
+            var fileStreamResult = new FileStreamResult(stream, "audio/mpeg");
+            fileStreamResult.FileDownloadName = filename;
+            return fileStreamResult; 
         }
 
         public string[] GetColumnFromName(string name, string column) {
@@ -87,7 +98,7 @@ namespace audio_player {
             return result;
         }
 
-        public string[] GetSongNames() {
+        public string[] GetSongNamesSQL() {
             List<string> songnames = new List<string>();
             MySqlConnection connection = new MySqlConnection(_sqlConnection);
             connection.Open();
@@ -102,6 +113,11 @@ namespace audio_player {
             reader.Close();
             connection.Close();
             return songnames.ToArray();
+        }
+
+        public IEnumerable<string> GetSongNames() {
+            var files = Directory.EnumerateFiles(@"./Songs").Select(Path.GetFileName);
+            return files;
         }
 
         //https://localhost:5001/mediahandler/downloadmediachunk?name=easy.mp3?idx=1?size=100
