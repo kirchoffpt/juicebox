@@ -46,5 +46,11 @@ namespace audio_player.Controllers {
             //System.Console.WriteLine(this.ModelState.IsValid);
             return new MediaHandler().GetSongStream(name, seek);
         }
+
+        [HttpGet]
+        //returns list of rooms that have uploaded audio available
+        public IEnumerable<string> getUsedRooms() {
+            return new MediaHandler().getUsedRooms();
+        }
     }
 }

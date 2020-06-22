@@ -71,6 +71,5 @@ namespace SignalRData {
             connection.Close();
             return users;
         }
-
     }
 }

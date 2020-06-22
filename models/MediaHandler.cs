@@ -15,6 +15,7 @@ namespace audio_player {
         }
 
         private string SanitizeString(string input){
+            if(input == null) return null;
             return rgx.Replace(input, "");
         }
 
@@ -24,6 +25,7 @@ namespace audio_player {
             var filename = SanitizeString(file.FileName);
             System.IO.Directory.CreateDirectory("Songs/"+roomId+"/");
             var filePath = @"./Songs/"+roomId+"/"+filename;
+            if(File.Exists(filePath)) return;
 
                 using(var memoryStream = new MemoryStream())
                 {
@@ -136,6 +138,18 @@ namespace audio_player {
             reader.Close();
             connection.Close();
             return chunks;
+        }
+
+        public IEnumerable<string> getUsedRooms() {
+            List<string> rooms = new List<string>();
+            MySqlConnection connection = new MySqlConnection(_sqlConnection);
+            var path = @"./Songs/";
+            string[] allrooms =  System.IO.Directory.GetDirectories(path);
+            foreach (string roompath in allrooms)
+            {
+                if( Directory.GetFiles(roompath+"/").Length > 0 ) rooms.Add(Path.GetFileName(roompath));
+            }
+            return rooms;
         }
     }
 }

@@ -32,7 +32,7 @@ export class UserList extends Component {
             users={this.props.users}
         ></UserElement>
         );
-    }
+    } 
 
     return (
         <div className="listWrapper">
@@ -64,7 +64,7 @@ class UserElement extends Component {
     var songname = this.props.songname;
     return (
         <ListGroupItem onClick={this.handleClick} className={classname} style={{paddingTop : 5, paddingBottom : 0}}>
-          <span className="badge badge-primary mr-1" style={pillBoxStyle}>{this.props.index}}</span>
+          <span className="badge badge-primary mr-1" style={pillBoxStyle}>{this.props.index}</span>
           {songname}
           <Slider
             className = "nopadding listgroupseekbar"

@@ -3,6 +3,7 @@ import { Route, Switch, useParams, Redirect } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Home } from './components/Home';
 import { AudioPlayer } from './components/AudioPlayer';
+import { JoinRoom } from './components/JoinRoom';
 
 import './custom.css'
 import { IntroInterface } from './components/IntroInterface';
@@ -20,6 +21,7 @@ export default class App extends Component {
       <Layout>
         <Switch>
           <Route path='/About' component={Home} />
+          <Route path='/Join' component={JoinRoom} />
           <Route exact path='/' component={IntroInterface} />
           <Route path="/:id" children={<Child userName={userName}/>} />
         </Switch>

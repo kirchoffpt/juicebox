@@ -1,18 +1,17 @@
 import React, { Component } from 'react';
 import {ListGroupItem} from 'reactstrap';
-import Slider from '@material-ui/core/Slider';
 
 export class SongList extends Component {
   static displayName = "Song List";
 
   constructor(props) {
     super(props);
-    this.state = {activeIndex : null};
+    this.state = {activeIndex : this.props.activeSong};
     this.listIdx = 0;
   }
 
   setCurrSong(songname){
-    document.getElementById("filetoget").value = songname; 
+    this.props.setCurrSong(songname);
     this.setState({ activeIndex: songname })
   }
 
@@ -23,10 +22,10 @@ export class SongList extends Component {
         listItems = this.props.songNames.map((songname) =>
         <SongElement 
             key={songname} 
-            index={songname} 
+            index={songname}
             onClick={() => this.setCurrSong(songname)} 
             songname={songname}
-            isActive={songname === this.state.activeIndex}
+            isActive={songname === this.props.activeSong}
             users={this.props.users}
             />
         );
@@ -56,7 +55,6 @@ class SongElement extends Component {
     var classname = "list-group-item list-group-item-action" + (this.props.isActive ? " active" : "");
     var pillBoxStyle = this.props.isActive ? {backgroundColor: "#1d1d1d"} : null;
     var songname = this.props.songname;
-    var userloc = [];
     var usersOnSong = 0;
     for (const user in this.props.users) {
       var userinfo = this.props.users[user];
@@ -64,7 +62,7 @@ class SongElement extends Component {
     }
     if(usersOnSong <= 0) usersOnSong = null;
     return (
-        <ListGroupItem onClick={this.handleClick} className={classname}>
+        <ListGroupItem onClick={this.handleClick} className={classname} id={songname}>
           {songname}<span className="ml-2 fixed-right badge badge-pill badge-primary" style={pillBoxStyle}>{usersOnSong}</span>
         </ListGroupItem>
     );

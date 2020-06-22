@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
+import { NavLink } from 'reactstrap';
 import { NavLink as Link } from 'react-router-dom';
 
 export class IntroInterface extends Component {
@@ -15,6 +15,7 @@ export class IntroInterface extends Component {
     return (
       <div>
         <NavLink tag={Link} to={"/"+Math.random().toString(36).substring(7)}><button className="btn btn-primary btn-lg btn-block">CREATE ROOM</button></NavLink>
+        <NavLink tag={Link} to={"/join"}><button className="btn btn-primary btn-lg btn-block">JOIN ROOM</button></NavLink>
       </div>
     );
   }
