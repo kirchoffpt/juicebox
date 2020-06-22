@@ -298,7 +298,7 @@ export class AudioPlayer extends Component {
     })
 
     this.audioElement.addEventListener('timeupdate', (function (event) {
-        connection.invoke("SendMessage", this.state.filename, Math.round(this.state.progress), this.props.roomID, this.props.userName).catch(function (err) {
+        connection.invoke("SendMessage", this.state.playingfile, Math.round(this.state.progress), this.props.roomID, this.props.userName).catch(function (err) {
             return console.error(err.toString());
         });
         event.preventDefault();
