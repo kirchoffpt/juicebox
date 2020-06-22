@@ -34,8 +34,14 @@ function Child(props) {
   let {id} = useParams();
 
   if(id.length > 6){
-  id = id.substr(0,6);
-  return <Redirect to={id}/>
+    id = id.substr(0,6);
+    return <Redirect to={id}/>
+  }
+
+  var alphanumid = id.replace(/[^a-zA-Z0-9]/gi,'');
+  if(id !== alphanumid){
+    id = alphanumid;
+    return <Redirect to={id}/>
   }
 
   return (

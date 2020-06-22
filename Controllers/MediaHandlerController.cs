@@ -15,7 +15,7 @@ namespace audio_player.Controllers {
         public int UploadMedia(IFormCollection data, IFormFile file) {
             System.Console.WriteLine(data["name"]);
             var m = new MediaHandler();
-            m.UploadMediaFile(file);
+            m.UploadMediaFile(file, data["roomId"]);
             return 0;
         }
 
@@ -25,14 +25,8 @@ namespace audio_player.Controllers {
         }
 
         [HttpGet]
-        //should probably deprecate at some point. useful for prototyping for now
-        public string[] GetColumnFromName(string name, string column) {
-            return new MediaHandler().GetColumnFromName(name, column);
-        }
-
-        [HttpGet]
-        public IEnumerable<string> GetSongNames() {
-            return new MediaHandler().GetSongNames();
+        public IEnumerable<string> GetSongNames(string roomId) {
+            return new MediaHandler().GetSongNames(roomId);
         }
 
         [HttpGet]
@@ -41,9 +35,9 @@ namespace audio_player.Controllers {
         }
 
         [HttpGet]
-        public FileContentResult GetSong(string name, int seek) {
+        public FileContentResult GetSong(string name, int seek, string roomId) {
             //System.Console.WriteLine(this.ModelState.IsValid);
-            var myfile = new MediaHandler().GetSong(name, seek);
+            var myfile = new MediaHandler().GetSong(name, seek, roomId);
             return myfile;
         }
 

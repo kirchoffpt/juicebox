@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
+import { NavLink as Link } from 'react-router-dom';
 
 export class IntroInterface extends Component {
 
@@ -12,33 +14,7 @@ export class IntroInterface extends Component {
    
     return (
       <div>
-        <div className="container">
-        <div className="row">&nbsp;</div>
-        <div className="row">
-            <div style={{color : "rgb(255,255,255)"}} className="col-2">User</div>
-            <div className="col-4"><input type="text" id="userInput" /></div>
-        </div>
-        <div className="row">
-            <div style={{color : "rgb(255,255,255)"}} className="col-2">Message</div>
-            <div className="col-4"><input type="text" id="messageInput" /></div>
-        </div>
-        <div className="row">&nbsp;</div>
-        <div className="row">
-            <div className="col-6">
-                <input type="button" id="sendButton" value="Send Message" />
-            </div>
-        </div>
-    </div>
-    <div className="row">
-        <div className="col-12">
-            <hr />
-        </div>
-    </div>
-    <div className="row">
-        <div className="col-6">
-            <ul style={{color : "rgb(255,255,255)"}} id="messagesList"></ul>
-        </div>
-    </div>
+        <NavLink tag={Link} to={"/"+Math.random().toString(36).substring(7)}><button className="btn btn-primary btn-lg btn-block">CREATE ROOM</button></NavLink>
       </div>
     );
   }

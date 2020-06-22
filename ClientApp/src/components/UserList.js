@@ -11,7 +11,7 @@ export class UserList extends Component {
     this.listIdx = 0;
   }
 
-  setCurrSong(songname){
+  setCurrIdx(songname){
     this.setState({ activeIndex: songname })
   }
 
@@ -25,8 +25,9 @@ export class UserList extends Component {
         <UserElement 
             key={user} 
             index={user} 
-            onClick={() => this.setCurrSong(user)} 
+            onClick={() => this.setCurrIdx(user)} 
             songname={this.props.users[user].songname}
+            seekloc={this.props.users[user].seekloc}
             isActive={user === this.state.activeIndex}
             users={this.props.users}
         ></UserElement>
@@ -61,18 +62,13 @@ class UserElement extends Component {
     var classname = "list-group-item list-group-item-action short-item" + (this.props.isActive ? " active" : "");
     var pillBoxStyle = this.props.isActive ? {backgroundColor: "#1d1d1d"} : null;
     var songname = this.props.songname;
-    var userloc = [];
-    for (const user in this.props.users) {
-      var userinfo = this.props.users[user];
-      if(userinfo.songname === songname) userloc.push(userinfo.seekloc);
-    }
     return (
         <ListGroupItem onClick={this.handleClick} className={classname} style={{paddingTop : 5, paddingBottom : 0}}>
           <span className="badge badge-primary mr-1" style={pillBoxStyle}>{this.props.index}}</span>
           {songname}
           <Slider
             className = "nopadding listgroupseekbar"
-            value={userloc}
+            value={this.props.seekloc}
             aria-labelledby="discrete-slider-small-steps"
             step={10}
             min={0}

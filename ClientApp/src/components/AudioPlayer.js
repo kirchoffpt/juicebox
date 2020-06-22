@@ -54,6 +54,7 @@ export class AudioPlayer extends Component {
 
     formData.append('file',file);
     formData.append('name',file.name);
+    formData.append('roomId', this.props.roomID);
     this.setState({uploadingSongNames});
     const options = {
       method: 'POST',
@@ -75,7 +76,7 @@ export class AudioPlayer extends Component {
     if(!filename) return;
     //this.audioElement.pause();
     if(seek < 1000) {
-      this.audioElement.src = 'mediahandler/getsong?name='+filename+'&seek='+seek.toString();
+      this.audioElement.src = 'mediahandler/getsong?name='+filename+'&seek='+seek.toString()+"&roomid="+this.props.roomID;
       this.audioElement.play();
     } else {
       this.audioElement.pause();
@@ -85,7 +86,7 @@ export class AudioPlayer extends Component {
   }
 
   async updateSongNames() {
-    const response = await fetch('mediahandler/getsongnames');
+    const response = await fetch('mediahandler/getsongnames?roomid='+this.props.roomID);
     const data = await response.json();
     this.setState({songNames : data});
   }
