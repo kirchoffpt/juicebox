@@ -1,5 +1,5 @@
 # Juicebox Audio Player
-Multiuser music player made with ASP.NET Core and React. Also uses MySQL database. [Hosted on Heroku](jboxaudio.herokuapp.com) using Docker.
+Multiuser music player made with ASP.NET Core and React. Also uses MySQL database. [Hosted on Heroku](http://jboxaudio.herokuapp.com) using Docker.
 ### :)
 
 Join/Create a room and upload/listen to mp3s.
