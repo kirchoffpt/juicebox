@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Collapse, Container, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { NavLink as Link } from 'react-router-dom';
 import './NavMenu.css';
 
 export class NavMenu extends Component {
   static displayName = NavMenu.name;
 
-  constructor (props) {
+  constructor(props) {
     super(props);
 
     this.toggleNavbar = this.toggleNavbar.bind(this);
@@ -15,29 +15,44 @@ export class NavMenu extends Component {
     };
   }
 
-  toggleNavbar () {
+  toggleNavbar() {
     this.setState({
       collapsed: !this.state.collapsed
     });
   }
 
-  render () {
+  render() {
     return (
       <header>
-        <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" light>
+        <Navbar style={{backgroundColor : "#121212"}} className="navbar-expand-sm navbar-toggleable-sm ng-white box-shadow mb-3" light>
           <Container>
-            <NavbarBrand tag={Link} to="/">audio_player</NavbarBrand>
+            <div>
+              <NavbarBrand tag={Link} to="/"  className="mr-1"
+                style={{
+                  color : "#606060",
+                  fontSize : "200%",
+                  fontWeight : "999",
+                }}>
+                JUICEBOX
+              </NavbarBrand>
+              <NavbarBrand tag={Link} to="/" className="ml-0"
+                style={{
+                  color : "#0275d8",
+                  fontSize : "100%",
+                  fontWeight : "999",
+                  fontStyle : "oblique",
+                }}>
+                audioplayer
+              </NavbarBrand>
+            </div>
             <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
             <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
               <ul className="navbar-nav flex-grow">
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/">Home</NavLink>
+                  <NavLink tag={Link} style={{color : "#606060"}} to="/about">About</NavLink>
                 </NavItem>
                 <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/counter">Counter</NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink tag={Link} className="text-dark" to="/fetch-data">Fetch data</NavLink>
+                  <NavLink tag={Link} style={{color : "#606060"}} to="/">Audio Player</NavLink>
                 </NavItem>
               </ul>
             </Collapse>

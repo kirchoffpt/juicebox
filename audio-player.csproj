@@ -11,7 +11,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <MySourceFiles Include="Songs\demo1\*.*"/>
+  </ItemGroup>
+
+  <Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
+    <Copy SourceFiles="@(MySourceFiles)" DestinationFolder="$(PublishDir)\Songs\demo1" />
+  </Target>
+
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.5" />
+    <PackageReference Include="MySql.Data" Version="8.0.20" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,5 +57,5 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
-
+ 
 </Project>

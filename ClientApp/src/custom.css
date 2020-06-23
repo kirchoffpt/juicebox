@@ -1,14 +1,79 @@
 /* Provide sufficient contrast against white background */
-a {
-  color: #0366d6;
-}
+/* bootstrap blue #0275d8 */
+
 
 code {
   color: #E01A76;
 }
 
+.darktheme {
+  background-color: rgb(24,24,24);
+  border-color: rgb(0, 0, 0);
+}
+
 .btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  color : #606060;
+  background-color: #141414;
+  border-color: #000000;
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .open>.dropdown-toggle.btn-primary {
+  color: rgb(255, 255, 255);
+}
+
+.list-group-item {
+  color: #606060;
+}
+
+.list-group-item, .input-group-text {
+  background-color: #141414;
+  border-color: #000000;
+}
+
+.list-group-item.active, .badge-primary{
+  background-color: #222222;
+  color : #0275d8;
+  border-color: #000000;
+}
+
+.badge-secondary {
+  color : #000000;
+  background-color :  #606060;
+}
+
+.list-group-item:hover {
+  background-color: #1d1d1d;
+  border-color: #000000;
+}
+
+.fullheight {
+  height : 100%;
+}
+
+.list-group-item:focus {
+  border-color: #000000;
+}
+
+.form-control {
+  background-color: #a0a0a0;
+  border-color: #000000;
+}
+
+.nopadding {
+  padding: 0 !important;
+
+}
+
+.listgrouppadding {
+  padding-bottom : 0;
+}
+
+.listgroupseekbar {
+  position : static;
+  bottom : 10px;
+}
+
+.MuiDrawer-paper {
+  width : 20%;
+  min-width: 250px;
 }

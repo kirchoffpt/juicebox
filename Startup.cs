@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SignalRData.Hubs;
 
 namespace audio_player
 {
@@ -22,6 +23,7 @@ namespace audio_player
         {
 
             services.AddControllersWithViews();
+            services.AddSignalR();
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -52,6 +54,7 @@ namespace audio_player
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<DataHub>("/datahub");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
