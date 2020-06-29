@@ -6,14 +6,16 @@ export class Visualizer extends Component {
 
     constructor(props) {
         super(props);
-        this.freqBandArray = new Uint8Array(32);
+        this.state = {
+            freqArray : new Uint8Array(32),
+        };
         this.runSpectrum = this.runSpectrum.bind(this);
       }
 
     runSpectrum(){
-      this.freqBandArray = this.props.getFrequencyData();
+      this.setState({freqArray : this.props.getFrequencyData()});
       requestAnimationFrame(this.runSpectrum);
-      this.forceUpdate();
+      //this.forceUpdate();
     }
 
     componentDidMount(){
@@ -22,19 +24,22 @@ export class Visualizer extends Component {
 
     render(){
 
-        var freqArray = Array.from(this.freqBandArray);
+        var freqArray = Array.from(this.state.freqArray);
         if(!freqArray) freqArray = Array.from(new Uint8Array(32));
         var key = 0;
         return (
 
-        <div>
+        <div style={{marginBottom : '0', height : '100px'}}>
             <div className="flex-container" style={{
                 display: 'flex',
                 flexWrap: 'nowrap',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
+                //justifyContent: 'center',
+                alignItems: 'stretch',
                 height : '100px',
-                paddingTop: '10%'}}>
+                paddingBottom : '0',
+                marginBottom : '0',
+                //paddingTop: '100%',
+            }}>
             {freqArray.map((num) =>
                 <Paper
                 className='frequencyBands'
@@ -43,7 +48,7 @@ export class Visualizer extends Component {
                 style={{
                     height : num.toString() + 'px',
                     backgroundColor : 'rgb(' +num.toString() + ',' + (117-num/3).toString() + ',216)',
-                    paddingBottom : 0,
+                    paddingBottom : '0',
                 }}
                 />
             )}

@@ -81,7 +81,7 @@ code {
 .frequencyBands {
   padding: 0;
   margin: 0;
-  transform: rotatex(180deg) scale(0.5);
+  transform: rotatex(180deg) scale(0.5) translate(0px, -200px);
   transform-origin: top;
   width : 25px;
   background-color: #0275d8;
