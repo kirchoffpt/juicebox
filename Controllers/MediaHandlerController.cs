@@ -42,9 +42,9 @@ namespace audio_player.Controllers {
         }
 
         [HttpGet]
-        public FileStreamResult GetSongStream(string name, int seek) {
+        public FileStreamResult GetSongStream(string name, string roomId) {
             //System.Console.WriteLine(this.ModelState.IsValid);
-            return new MediaHandler().GetSongStream(name, seek);
+            return new MediaHandler().GetSongStream(name, roomId);
         }
 
         [HttpGet]

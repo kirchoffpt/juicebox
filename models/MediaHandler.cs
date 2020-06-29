@@ -80,18 +80,23 @@ namespace audio_player {
             int fileLength = myfile.Length;
             int skipBytes = (fileLength/1000)*seek;
             myfile = myfile.Skip(skipBytes).ToArray();
-            return new FileContentResult(myfile, "audio/mpeg"); 
+            var result = new FileContentResult(myfile, "audio/mpeg");
+            result.EnableRangeProcessing = true;
+            return result; 
         }
 
-        public FileStreamResult GetSongStream(string filename, int seek) {
+        public FileStreamResult GetSongStream(string filename, string roomId) {
+            roomId = SanitizeString(roomId);
             filename = SanitizeString(filename);
-            if(!File.Exists(@"./Songs/"+filename)){
+            var filepath=@"./Songs/"+roomId+"/"+filename;
+            if(!File.Exists(filepath)){
                 return null;
             }
-            var fileContent = System.IO.File.ReadAllBytes(@"./Songs/"+filename);
-            var stream = new MemoryStream(fileContent);
-            var fileStreamResult = new FileStreamResult(stream, "audio/mpeg");
+            //var fileContent = System.IO.File.ReadAllBytes(filepath);
+            var fileStream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var fileStreamResult = new FileStreamResult(fileStream, "audio/mpeg");
             fileStreamResult.FileDownloadName = filename;
+            fileStreamResult.EnableRangeProcessing = true;
             return fileStreamResult; 
         }
 

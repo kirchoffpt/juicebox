@@ -77,3 +77,12 @@ code {
   width : 20%;
   min-width: 250px;
 }
+
+.frequencyBands {
+  padding: 0;
+  margin: 0;
+  transform: rotatex(180deg) scale(0.5);
+  transform-origin: top;
+  width : 25px;
+  background-color: #0275d8;
+}
