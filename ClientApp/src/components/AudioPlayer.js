@@ -39,8 +39,8 @@ export class AudioPlayer extends Component {
     this.audioContext = new AudioContext();
     this.audioSource = this.audioContext.createMediaElementSource(this.audioElement);
     this.analyser = this.audioContext.createAnalyser();
-    this.analyser.fftSize = 128;
-    this.analyser.smoothingTimeConstant = 0.6;
+    this.analyser.fftSize = 512;
+    this.analyser.smoothingTimeConstant = 0.85;
     this.audioSource.connect(this.audioContext.destination);
     this.audioSource.connect(this.analyser);
     this.amplArray = new Uint8Array(this.analyser.frequencyBinCount);
