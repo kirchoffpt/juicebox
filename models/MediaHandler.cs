@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace audio_player {
     public class MediaHandler {
-        private static string _sqlConnection = "server=127.0.0.1;port=3306;userid=dev;password=devpassword;database=myDatabase";
+        private static string _sqlConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
         private static Regex rgx = new Regex("[^a-zA-Z0-9.! -]"); //for sanitizing 
         public MediaHandler() {
         }

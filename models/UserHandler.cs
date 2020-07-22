@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SignalRData {
     public class UserHandler {
-        private static string _sqlConnection = "server=96.253.124.15;port=3306;userid=dev;password=devpassword;database=myDatabase";
+        private static string _sqlConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
         public string roomId;
         public string userName;
         public UserHandler() {
@@ -70,6 +70,11 @@ namespace SignalRData {
             reader.Close();
             connection.Close();
             return users;
+        }
+        public IEnumerable<string> TESTgetDatabaseUrl() {
+            List<string> results = new List<string>();
+            results.Add(Environment.GetEnvironmentVariable("DATABASE_URL"));
+            return results;
         }
     }
 }
