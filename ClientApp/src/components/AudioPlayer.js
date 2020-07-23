@@ -103,6 +103,7 @@ export class AudioPlayer extends Component {
       this.audioElement.pause();
     } else {
       this.audioElement.play();
+      this.audioContext.resume();
     }
     this.playing = !this.playing;
     this.setState({playBtnToggle : !this.state.playBtnToggle});
