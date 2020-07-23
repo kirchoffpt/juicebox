@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Data.SqlClient;
 using System.Collections.Generic;
+using Npgsql;
 using MySql.Data.MySqlClient;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +14,13 @@ namespace audio_player {
         private static string _sqlConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
         private static Regex rgx = new Regex("[^a-zA-Z0-9.! -]"); //for sanitizing 
         public MediaHandler() {
+            Uri url;
+            System.Console.WriteLine(_sqlConnection);
+            bool isUrl = Uri.TryCreate(_sqlConnection, UriKind.Absolute, out url);
+            if(isUrl) {
+               var connectionUrl = $"host={url.Host};port={url.Port};username={url.UserInfo.Split(':')[0]};password={url.UserInfo.Split(':')[1]};database={url.LocalPath.Substring(1)};SSL Mode=Require;Trust Server Certificate=true";
+                _sqlConnection = connectionUrl;
+            }
         }
 
         private string SanitizeString(string input){
@@ -147,7 +156,7 @@ namespace audio_player {
 
         public IEnumerable<string> getUsedRooms() {
             List<string> rooms = new List<string>();
-            MySqlConnection connection = new MySqlConnection(_sqlConnection);
+            //NpgsqlConnection connection = new NpgsqlConnection(_sqlConnection);
             var path = @"./Songs/";
             string[] allrooms =  System.IO.Directory.GetDirectories(path);
             foreach (string roompath in allrooms)

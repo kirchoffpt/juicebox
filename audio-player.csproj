@@ -27,6 +27,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.5" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="MySql.Data" Version="8.0.20" />
+    <PackageReference Include="npgsql" Version="4.1.4" />
+    <PackageReference Include="system.data.sqlclient" Version="4.8.1" />
   </ItemGroup>
 
   <ItemGroup>
