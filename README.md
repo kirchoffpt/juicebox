@@ -17,6 +17,6 @@ Click on users to see who is listening to what in real time.
  - When heroku dyno does its daily reset it doesn't gracefully close all signalR connections leaving users in database that aren't actually connected. This will be fixed.
  - For the purposes of the demo and to keep this project free of cost, uploaded files are not currently uploaded to a database but rather the server's local file path. They get wiped when the dyno resets. This also means there is quite a hard limit on how many songs can be uploaded.
 
-## Build
+### Build
 Build should be pretty straight forward with vscode or visual studio but the DATABASE_URL environment variable will need to be set (most easily done in generated launch.json) with a postgresql URI.
 
