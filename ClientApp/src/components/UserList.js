@@ -62,6 +62,11 @@ class UserElement extends Component {
     var classname = "list-group-item list-group-item-action short-item" + (this.props.isActive ? " active" : "");
     var pillBoxStyle = this.props.isActive ? {backgroundColor: "#1d1d1d"} : null;
     var songname = this.props.songname;
+    if(!songname) return (
+      <ListGroupItem onClick={this.handleClick} className={classname} style={{paddingTop : 5, paddingBottom : 8}}>
+      <span className="badge badge-primary mr-1" style={pillBoxStyle}>{this.props.index}</span>
+    </ListGroupItem>
+    );
     return (
         <ListGroupItem onClick={this.handleClick} className={classname} style={{paddingTop : 5, paddingBottom : 0}}>
           <span className="badge badge-primary mr-1" style={pillBoxStyle}>{this.props.index}</span>

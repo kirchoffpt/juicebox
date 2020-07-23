@@ -8,10 +8,13 @@
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
     <RootNamespace>audio_player</RootNamespace>
+    <UserSecretsId>60f982ec-057a-4b7f-968d-7a41c168641d</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
-    <MySourceFiles Include="Songs\demo1\*.*"/>
+    <MySourceFiles Include="Songs\demo1\*.*" />
   </ItemGroup>
 
   <Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
@@ -22,7 +25,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.5" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="MySql.Data" Version="8.0.20" />
+    <PackageReference Include="npgsql" Version="4.1.4" />
+    <PackageReference Include="system.data.sqlclient" Version="4.8.1" />
   </ItemGroup>
 
   <ItemGroup>

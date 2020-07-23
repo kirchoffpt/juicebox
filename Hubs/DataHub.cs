@@ -35,9 +35,10 @@ namespace SignalRData.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            var uH = new UserHandler(Context.ConnectionId);
-            RemoveUserFromClient(uH.roomId, uH.userName);
-            uH.removeUser(uH.userName);
+            var uH = new UserHandler();
+            UserInfo info = uH.GetUserInfoFromConnId(Context.ConnectionId);
+            RemoveUserFromClient(info.RoomId, info.Username);
+            uH.removeUser(info.Username);
             return base.OnDisconnectedAsync(exception);
         }
     }

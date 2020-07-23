@@ -29,22 +29,22 @@ namespace audio_player.Controllers {
             return new MediaHandler().GetSongNames(roomId);
         }
 
-        [HttpGet]
-        public string[] DownloadMediaChunk(string name, int idx, int size) {
-            return new MediaHandler().DownloadMediaChunk(name, idx, size);
-        }
+        // [HttpGet]
+        // public string[] DownloadMediaChunk(string name, int idx, int size) {
+        //     return new MediaHandler().DownloadMediaChunk(name, idx, size);
+        // }
+
+        // [HttpGet]
+        // public FileContentResult GetSong(string name, int seek, string roomId) {
+        //     //System.Console.WriteLine(this.ModelState.IsValid);
+        //     var myfile = new MediaHandler().GetSong(name, seek, roomId);
+        //     return myfile;
+        // }
 
         [HttpGet]
-        public FileContentResult GetSong(string name, int seek, string roomId) {
+        public FileStreamResult GetSongStream(string name, string roomId) {
             //System.Console.WriteLine(this.ModelState.IsValid);
-            var myfile = new MediaHandler().GetSong(name, seek, roomId);
-            return myfile;
-        }
-
-        [HttpGet]
-        public FileStreamResult GetSongStream(string name, int seek) {
-            //System.Console.WriteLine(this.ModelState.IsValid);
-            return new MediaHandler().GetSongStream(name, seek);
+            return new MediaHandler().GetSongStream(name, roomId);
         }
 
         [HttpGet]

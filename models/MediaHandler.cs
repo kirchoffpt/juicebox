@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Data.SqlClient;
 using System.Collections.Generic;
+using Npgsql;
 using MySql.Data.MySqlClient;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +11,16 @@ using System.Text.RegularExpressions;
 
 namespace audio_player {
     public class MediaHandler {
-        private static string _sqlConnection = "server=127.0.0.1;port=3306;userid=dev;password=devpassword;database=myDatabase";
+        private static string _sqlConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
         private static Regex rgx = new Regex("[^a-zA-Z0-9.! -]"); //for sanitizing 
         public MediaHandler() {
+            Uri url;
+            System.Console.WriteLine(_sqlConnection);
+            bool isUrl = Uri.TryCreate(_sqlConnection, UriKind.Absolute, out url);
+            if(isUrl) {
+               var connectionUrl = $"host={url.Host};port={url.Port};username={url.UserInfo.Split(':')[0]};password={url.UserInfo.Split(':')[1]};database={url.LocalPath.Substring(1)};SSL Mode=Require;Trust Server Certificate=true";
+                _sqlConnection = connectionUrl;
+            }
         }
 
         private string SanitizeString(string input){
@@ -80,18 +89,23 @@ namespace audio_player {
             int fileLength = myfile.Length;
             int skipBytes = (fileLength/1000)*seek;
             myfile = myfile.Skip(skipBytes).ToArray();
-            return new FileContentResult(myfile, "audio/mpeg"); 
+            var result = new FileContentResult(myfile, "audio/mpeg");
+            result.EnableRangeProcessing = true;
+            return result; 
         }
 
-        public FileStreamResult GetSongStream(string filename, int seek) {
+        public FileStreamResult GetSongStream(string filename, string roomId) {
+            roomId = SanitizeString(roomId);
             filename = SanitizeString(filename);
-            if(!File.Exists(@"./Songs/"+filename)){
+            var filepath=@"./Songs/"+roomId+"/"+filename;
+            if(!File.Exists(filepath)){
                 return null;
             }
-            var fileContent = System.IO.File.ReadAllBytes(@"./Songs/"+filename);
-            var stream = new MemoryStream(fileContent);
-            var fileStreamResult = new FileStreamResult(stream, "audio/mpeg");
+            //var fileContent = System.IO.File.ReadAllBytes(filepath);
+            var fileStream = new FileStream(filepath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            var fileStreamResult = new FileStreamResult(fileStream, "audio/mpeg");
             fileStreamResult.FileDownloadName = filename;
+            fileStreamResult.EnableRangeProcessing = true;
             return fileStreamResult; 
         }
 
@@ -142,7 +156,7 @@ namespace audio_player {
 
         public IEnumerable<string> getUsedRooms() {
             List<string> rooms = new List<string>();
-            MySqlConnection connection = new MySqlConnection(_sqlConnection);
+            //NpgsqlConnection connection = new NpgsqlConnection(_sqlConnection);
             var path = @"./Songs/";
             string[] allrooms =  System.IO.Directory.GetDirectories(path);
             foreach (string roompath in allrooms)

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { SongList } from './SongList';
-import { UserList} from './UserList';
+import { UserList } from './UserList';
+import { Visualizer } from './Visualizer';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { Drawer, CircularProgress, Slider } from '@material-ui/core';
 
@@ -14,7 +15,6 @@ export class AudioPlayer extends Component {
       playingfile : "",
       uploadingSongNames : [],
       progress : 0,
-      progressStart : 0,
       users : {},
       drawer : false,
     };
@@ -31,7 +31,20 @@ export class AudioPlayer extends Component {
     this.setCurrSong = this.setCurrSong.bind(this);
     this.setVolume = this.setVolume.bind(this);
     this.toggleUserDrawer = this.toggleUserDrawer.bind(this);
+    this.getFrequencyBandData = this.getFrequencyBandData.bind(this);
+
     this.audioElement = new Audio();
+
+    //visualizer stuff
+    this.audioContext = new AudioContext();
+    this.audioSource = this.audioContext.createMediaElementSource(this.audioElement);
+    this.analyser = this.audioContext.createAnalyser();
+    this.analyser.fftSize = 256;
+    this.analyser.smoothingTimeConstant = 0.85;
+    this.audioSource.connect(this.audioContext.destination);
+    this.audioSource.connect(this.analyser);
+    this.amplArray = new Uint8Array(this.analyser.frequencyBinCount);
+    
     this.dragging = false;
     this.initialVolumeBarVal = 0.5;
     this.playing = this.state.playBtnToggle; //some of these are out of state to make sure they are dealt with synchronously
@@ -76,11 +89,10 @@ export class AudioPlayer extends Component {
 
   setCurrSong(songname){
     var seek = 0;
-    this.setState({progressStart : seek});
     if(this.state.playingfile === songname){
       return;
     }
-    this.audioElement.src = 'mediahandler/getsong?name='+songname+'&seek='+seek.toString()+"&roomid="+this.props.roomID;
+    this.audioElement.src = 'mediahandler/getsongstream?name='+songname+"&roomid="+this.props.roomID;
     if(this.playing) this.audioElement.play();
     document.getElementById("filetoget").value = songname;
     this.setState({progress : 0, playingfile : songname});
@@ -91,6 +103,7 @@ export class AudioPlayer extends Component {
       this.audioElement.pause();
     } else {
       this.audioElement.play();
+      this.audioContext.resume();
     }
     this.playing = !this.playing;
     this.setState({playBtnToggle : !this.state.playBtnToggle});
@@ -127,9 +140,14 @@ export class AudioPlayer extends Component {
 
   handleProgress(event) {
     if(this.dragging) return;
-    var progress = this.state.progressStart;
-    progress = progress+(1000-progress)*this.audioElement.currentTime/this.audioElement.duration;
+    var progress = 1000*this.audioElement.currentTime/this.audioElement.duration;
+
     if(progress) this.setState({progress});
+  }
+
+  getFrequencyBandData(){
+    this.analyser.getByteFrequencyData(this.amplArray);
+    return this.amplArray;
   }
 
 
@@ -152,9 +170,10 @@ export class AudioPlayer extends Component {
     if(!this.state.playingfile) return;
     //this.audioElement.pause();
     if(seek < 1000) {
-      this.audioElement.src = 'mediahandler/getsong?name='+this.state.playingfile+'&seek='+seek.toString()+"&roomid="+this.props.roomID;
+      //this.audioElement.src = 'mediahandler/getsong?name='+this.state.playingfile+'&seek='+seek.toString()+"&roomid="+this.props.roomID;
+      this.audioElement.currentTime = this.audioElement.duration*seek/1000;
       if(this.playing) this.audioElement.play();
-      this.setState({progressStart : seek})
+      this.setState({progress : seek})
     } else {
       this.audioElement.pause()
       this.nextTrack();
@@ -216,7 +235,8 @@ export class AudioPlayer extends Component {
           valueLabelDisplay="off"
           onChange={this.setVolume}
         />
-        <div className="input-group mb-4">
+        <Visualizer className="mb-1" getFrequencyData={this.getFrequencyBandData}></Visualizer>
+        <div className="input-group mb-3">
           <div className="input-group-prepend">
             <span className="input-group-text" id="basic-addon1">♫</span>
           </div>
@@ -226,7 +246,7 @@ export class AudioPlayer extends Component {
           </button>
         </div>
         <Slider
-          className = "mb-3"
+          className = "mb-2"
           id="trackbar"
           defaultValue={0}
           value={this.state.progress}
@@ -299,7 +319,7 @@ export class AudioPlayer extends Component {
 
     this.audioElement.addEventListener('timeupdate', (function (event) {
         connection.invoke("SendMessage", this.state.playingfile, Math.round(this.state.progress), this.props.roomID, this.props.userName).catch(function (err) {
-            return console.error(err.toString());
+            return console.error(err.toString() + 'in timeupdate');
         });
         event.preventDefault();
     }).bind(this));
