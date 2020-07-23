@@ -16,11 +16,5 @@ namespace audio_player.Controllers {
         public IEnumerable<string> getOtherUsers(string thisUser, string roomId) {
             return new UserHandler().getOtherUsers(thisUser, roomId);
         }
-
-        //GET RID OF THIS
-        [HttpGet]
-        public IEnumerable<string> TESTgetDatabaseUrl() {
-            return new UserHandler().TESTgetDatabaseUrl();
-        }
     }
 }

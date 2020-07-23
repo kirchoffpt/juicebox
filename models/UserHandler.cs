@@ -81,10 +81,5 @@ namespace SignalRData {
             connection.Close();
             return users;
         }
-        public IEnumerable<string> TESTgetDatabaseUrl() {
-            List<string> results = new List<string>();
-            results.Add(Environment.GetEnvironmentVariable("DATABASE_URL"));
-            return results;
-        }
     }
 }
