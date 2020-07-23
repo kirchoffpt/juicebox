@@ -1,5 +1,5 @@
 # Juicebox Audio Player
-Multi-user music player made with ASP.NET Core and React. Also uses PostgreSQL database (previously used MySQL). [Hosted on Heroku](http://jboxaudio.herokuapp.com) using Docker. Made as an example full stack project.
+Multi-user music player made with ASP.NET Core and React. Also uses PostgreSQL database (previously used MySQL). [Hosted on Heroku](http://jboxaudio.herokuapp.com) using Docker. Made as an example full stack project. This started as a group project but very quickly became a solo one.
 ### :)
 
 Join/Create a room and upload/listen to mp3s.
@@ -10,7 +10,7 @@ Click on users to see who is listening to what in real time.
 ## TODO
 - Sync to other user option
 - User Login
-- Additional music sources
+- Additional music sources (although spotify/youtube/etc isnt exactly legal)
 - Other stuff
 
 ### Current Issues/Limitations
@@ -20,5 +20,4 @@ Click on users to see who is listening to what in real time.
 ### Build
 Build should be pretty straight forward with vscode or visual studio but the DATABASE_URL environment variable will need to be set (most easily done in generated launch.json) with a postgresql URI. 
 
-###### Was worked on with github.com/justentn for the first couple days.
 
