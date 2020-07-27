@@ -158,6 +158,7 @@ namespace audio_player {
             List<string> rooms = new List<string>();
             //NpgsqlConnection connection = new NpgsqlConnection(_sqlConnection);
             var path = @"./Songs/";
+            System.IO.Directory.CreateDirectory(path);
             string[] allrooms =  System.IO.Directory.GetDirectories(path);
             foreach (string roompath in allrooms)
             {
